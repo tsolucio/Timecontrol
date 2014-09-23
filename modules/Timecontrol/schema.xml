@@ -1,0 +1,33 @@
+<?xml version='1.0'?>
+<schema>
+	<tables>
+		<table>
+			<name>vtiger_timecontrol</name>
+			<sql><![CDATA[CREATE TABLE `vtiger_timecontrol` (
+  `timecontrolid` int(11) NOT NULL DEFAULT '0',
+  `title` varchar(100) DEFAULT NULL,
+  `relconcept` varchar(256) DEFAULT NULL,
+  `date_start` date DEFAULT NULL,
+  `time_start` varchar(100) DEFAULT NULL,
+  `date_end` date DEFAULT NULL,
+  `time_end` varchar(100) DEFAULT NULL,
+  `relatedto` int(11) DEFAULT NULL,
+  `product_id` int(11) DEFAULT NULL,
+  `totaltime` varchar(100) DEFAULT NULL,
+  `timecontrolnr` varchar(100) DEFAULT NULL,
+  `invoiced` varchar(100) DEFAULT NULL,
+  `tcunits` decimal(6,2) DEFAULT NULL,
+  `totaldaytime` varchar(10) DEFAULT NULL,
+  `totaldayhours` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`timecontrolid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8]]></sql>
+		</table>
+		<table>
+			<name>vtiger_timecontrolcf</name>
+			<sql><![CDATA[CREATE TABLE `vtiger_timecontrolcf` (
+  `timecontrolid` int(11) NOT NULL,
+  PRIMARY KEY (`timecontrolid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8]]></sql>
+		</table>
+	</tables>
+</schema>
