@@ -45,6 +45,28 @@ if ($isduplicate=='restart') {
   $focus->column_fields['totaltime'] = '';
 }
 if(empty($_REQUEST['record']) && $focus->mode != 'edit'){
+ if (!empty($_REQUEST['calendarrecord'])) { // coming from Calendar (4You)
+ 	require_once 'modules/Calendar/Calendar.php';
+ 	$c4y = CRMEntity::getInstance('Calendar');
+ 	$c4yrecord = vtlib_purify($_REQUEST['calendarrecord']);
+ 	$c4y->id = vtlib_purify($c4yrecord);
+ 	$activity_mode = vtlib_purify($_REQUEST['activity_mode']);
+ 	$c4y->retrieve_entity_info($c4yrecord, ($activity_mode == 'Task' ? 'Calendar' : 'Events'));
+ 	$focus->column_fields['title'] = getTranslatedString($c4y->column_fields['activitytype'],'Calendar').' :: '.$c4y->column_fields['subject'];
+ 	$focus->column_fields['date_start'] = $c4y->column_fields['date_start'];
+ 	$focus->column_fields['time_start'] = $c4y->column_fields['time_start'];
+ 	$focus->column_fields['date_end'] = $c4y->column_fields['due_date'];
+ 	if ($activity_mode == 'Task') {
+ 		$vtnow=new DateTimeField(null);
+ 		$focus->column_fields['time_end'] = $vtnow->getDisplayTime($current_user);
+ 	} else {
+ 		$focus->column_fields['time_end'] = $c4y->column_fields['time_end'];
+ 	}
+ 	$focus->column_fields['relatedto'] = $c4y->column_fields['parent_id'];
+ 	$focus->column_fields['tcunits'] = 1;
+ 	$focus->column_fields['assigned_user_id'] = $c4y->column_fields['assigned_user_id'];
+ 	$focus->column_fields['description'] = $c4y->column_fields['description'];
+ } else {
   $vtnow=new DateTimeField(null);
   $focus->column_fields['time_start'] = $vtnow->getDisplayTime($current_user);
   $focus->column_fields['date_start'] = $vtnow->getDBInsertDateValue($current_user);
@@ -58,6 +80,7 @@ if(empty($_REQUEST['record']) && $focus->mode != 'edit'){
    }
   }
   setObjectValuesFromRequest($focus);
+}
 }
 
 // Contribution made by Ted Janzen of Janzen & Janzen ICT Services http://www.j2ict.nl
