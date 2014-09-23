@@ -71,7 +71,6 @@ if(empty($_REQUEST['record']) && $focus->mode != 'edit'){
   $focus->column_fields['time_start'] = $vtnow->getDisplayTime($current_user);
   $focus->column_fields['date_start'] = $vtnow->getDBInsertDateValue($current_user);
   $focus->column_fields['date_end'] = $vtnow->getDBInsertDateValue($current_user);
-  $focus->column_fields['tcunits'] = 1;
   $rshd=$adb->pquery('select tcproduct from vtiger_users where id=?',array($current_user->id));
   if ($rshd) {
    $tcpdo = $adb->query_result($rshd,0,'tcproduct');
