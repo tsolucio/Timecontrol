@@ -15,10 +15,12 @@
   `product_id` int(11) DEFAULT NULL,
   `totaltime` varchar(100) DEFAULT NULL,
   `timecontrolnr` varchar(100) DEFAULT NULL,
-  `invoiced` varchar(100) DEFAULT NULL,
+  `invoiced` varchar(3) NOT NULL DEFAULT '0',
   `tcunits` decimal(6,2) DEFAULT NULL,
   `totaldaytime` varchar(10) DEFAULT NULL,
   `totaldayhours` decimal(10,2) DEFAULT NULL,
+  `relatednum` varchar(255) DEFAULT NULL,
+  `relatedname` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`timecontrolid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8]]></sql>
 		</table>
