@@ -58,7 +58,6 @@ class Timecontrol extends CRMEntity {
     'Date Start' => array('timecontrol', 'date_start'),
     'Time Start' => array('timecontrol', 'time_start'),
     'Total Time' => array('timecontrol', 'totaltime'),
-	'Description' => Array('crmentity','description'),
     'Assigned To' => Array('crmentity','smownerid')
 	);
 	var $list_fields_name = Array(
@@ -68,7 +67,6 @@ class Timecontrol extends CRMEntity {
     'Date Start' => 'date_start',
     'Time Start' => 'time_start',
     'Total Time' => 'totaltime',
-	'Description' => 'description',
 		'Assigned To' => 'assigned_user_id'
 	);
 
