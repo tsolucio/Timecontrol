@@ -8,14 +8,13 @@
  * All Rights Reserved.
  ************************************************************************************/
 global $app_strings, $mod_strings, $current_language, $currentModule, $theme, $current_user;
-
 require_once('Smarty_setup.php');
 
 $focus = CRMEntity::getInstance($currentModule);
 $smarty = new vtigerCRM_Smarty();
 
 $category = getParentTab($currentModule);
-$record = $_REQUEST['record'];
+$record = vtlib_purify($_REQUEST['record']);
 $isduplicate = vtlib_purify($_REQUEST['isDuplicate']);
 
 //added to fix the issue4600
@@ -71,12 +70,9 @@ if (!empty($_REQUEST['relatedto']) and getSalesEntityType($_REQUEST['relatedto']
 }
 
 $disp_view = getView($focus->mode);
-if($disp_view == 'edit_view') {
 	$smarty->assign('BLOCKS', getBlocks($currentModule, $disp_view, $focus->mode, $focus->column_fields));
-} else {
 	$smarty->assign('BASBLOCKS', getBlocks($currentModule, $disp_view, $focus->mode, $focus->column_fields, 'BAS'));
 	$smarty->assign('ADVBLOCKS',getBlocks($currentModule,$disp_view,$mode,$focus->column_fields,'ADV'));
-}
 
 $smarty->assign('OP_MODE',$disp_view);
 $smarty->assign('APP', $app_strings);
@@ -89,6 +85,7 @@ $smarty->assign("THEME", $theme);
 $smarty->assign('IMAGE_PATH', "themes/$theme/images/");
 $smarty->assign('ID', $focus->id);
 $smarty->assign('MODE', $focus->mode);
+$smarty->assign('CREATEMODE', vtlib_purify($_REQUEST['createmode']));
 
 $smarty->assign('CHECK', Button_Check($currentModule));
 $smarty->assign('DUPLICATE', $isduplicate);
