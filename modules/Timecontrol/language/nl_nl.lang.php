@@ -13,32 +13,35 @@ www.robusoft.com
 
  ************************************************************************************/
 
-$mod_strings = Array(
-	'Timecontrol' => 'Timecontrol',
-
+$mod_strings = array(
+	'Timecontrol' => 'Urenregistratie',
 	'LBL_CUSTOM_INFORMATION' => 'Standaard Informatie',
 	'LBL_TIMECONTROL_INFORMATION' => 'Tijdcontrole Informatie',
 	'LBL_DESCRIPTION_INFORMATION' => 'Omschrijving Informatie',
-	
-	'SINGLE_Timecontrol'=>'Tijdcontrole',
-	
-	'LBL_WATCH_STOP'=>'Stop',
-	'LBL_WATCH_RESTART'=>'Ga door',
-
-	'Timecontrol Number' => "Tijdcontrole Nummer",
-	'Title' => "Titel",
-	'Related Concept' => "Gerelateerd Concept",
-	'Date Start' => "Datum Start",
-	'Time Start' => "Tijd Start",
-	'Date End' => "Datum Eind",
-	'Time End' => "Tijd Eind",
-	'TotalTime' => "Totaal Tijd",
-	'Related To' => "Gerelateerd Aan",
-	'Product Name' => "Product/Service",
-	'Units' => 'Units',
-	
-	'relatednum' => 'Related Num',
-	'relatedname' => 'Related Name',
+	'SINGLE_Timecontrol' => 'Tijdcontrole',
+	'LBL_WATCH_STOP' => 'Stop',
+	'LBL_WATCH_RESTART' => 'Ga door',
+	'Timecontrol Number' => 'Tijdcontrole Nummer',
+	'Title' => 'Titel',
+	'Related Concept' => 'Gerelateerd Concept',
+	'Date Start' => 'Datum Start',
+	'Time Start' => 'Tijd Start',
+	'Date End' => 'Datum Eind',
+	'Time End' => 'Tijd Eind',
+	'TotalTime' => 'Totaal Tijd',
+	'Related To' => 'Gerelateerd Aan',
+	'Product Name' => 'Product/Service',
+	'Units' => 'Eenheden',
+	'relatednum' => 'Nummer gerelateerd item',
+	'relatedname' => 'Naam gerelateerd item',
+	'Invoiced' => 'Factuur gemaakt',
+	'Assigned To' => 'Toegewezen aan',
+	'Created Time' => 'Gemaakt om',
+	'Modified Time' => 'Gewijzigd om',
+	'TotalDayTime' => 'Totale tijd deze dag',
+	'TotalDayHours' => 'Totaal uren deze dag',
+	'Description' => 'Omschrijving',
+	'Klant' => 'Klant',
+	'Invoiced on' => 'Gefactureerd op',
 );
-
 ?>
