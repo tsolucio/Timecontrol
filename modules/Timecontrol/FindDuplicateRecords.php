@@ -9,7 +9,6 @@
  ********************************************************************************/
 require_once('Smarty_setup.php');
 require_once('include/utils/utils.php');
-require_once('database/DatabaseConnection.php');
 
 global $mod_strings, $app_strings, $app_list_strings;
 global $current_language, $currentModule, $current_userid, $theme;
