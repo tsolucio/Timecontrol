@@ -580,9 +580,13 @@ class Timecontrol extends CRMEntity {
 	 */
 	function vtlib_handler($modulename, $event_type) {
 		global $adb;
+		require_once('include/events/include.inc');
+		include_once('vtlib/Vtiger/Module.php');
+		$em = new VTEventsManager($adb);
 		if($event_type == 'module.postinstall') {
 			// TODO Handle post installation actions
 			$this->setModuleSeqNumber('configure', $modulename, 'TIME-BILLING-', '000001');
+			$em->registerHandler('corebos.filter.CalendarModule.save', 'modules/Timecontrol/TCCalendarHandler.php', 'TCCalendarHandler');
 			self::addTSRelations();
 		} else if($event_type == 'module.disabled') {
 			// TODO Handle actions when this module is disabled.
@@ -602,6 +606,7 @@ class Timecontrol extends CRMEntity {
 			$adb->query("ALTER TABLE vtiger_timecontrol ADD relatednum VARCHAR(255) NULL, ADD relatedname VARCHAR(255) NULL");
 			$adb->query("ALTER TABLE vtiger_timecontrol CHANGE invoiced invoiced VARCHAR(3) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0'");
 			$adb->query("UPDATE vtiger_timecontrol SET `invoiced`=0 WHERE invoiced!=1 or invoiced is null");
+			$em->registerHandler('corebos.filter.CalendarModule.save', 'modules/Timecontrol/TCCalendarHandler.php', 'TCCalendarHandler');
 		}
 	}
 

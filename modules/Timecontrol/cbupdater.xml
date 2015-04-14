@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updatesChangeLog>
+<changeSet>
+	<author>joebordes</author>
+	<description>Register Timecontrol in Calendar Save</description>
+	<filename>modules/Timecontrol/changeSets/registerTimecontrolCalendarSave.php</filename>
+	<classname>registerTimecontrolCalendarSave</classname>
+	<systemupdate>false</systemupdate>
+</changeSet>
+</updatesChangeLog>
