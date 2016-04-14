@@ -26,6 +26,21 @@ if ($_REQUEST['stop_watch']) {
   $focus->column_fields['description'] = decode_html($focus->column_fields['description']);
 }
 else {
+	// We set the time fields to DB format
+	if (!empty($_REQUEST['date_start']) and !empty($_REQUEST['time_start'])) {
+		$dt = new DateTimeField($_REQUEST['date_start']);
+		$fmtdt = $dt->convertToDBFormat($_REQUEST['date_start']);
+		$time_start = DateTimeField::convertToDBTimeZone($fmtdt.' '.$_REQUEST['time_start']);
+		$ts = $time_start->format('H:i:s');
+		$_REQUEST['time_start'] = $ts;
+	}
+	if (!empty($_REQUEST['date_end']) and !empty($_REQUEST['time_end'])) {
+		$dt = new DateTimeField($_REQUEST['date_end']);
+		$fmtdt = $dt->convertToDBFormat($_REQUEST['date_end']);
+		$time_end = DateTimeField::convertToDBTimeZone($fmtdt.' '.$_REQUEST['time_end']);
+		$te = $time_end->format('H:i:s');
+		$_REQUEST['time_end'] = $te;
+	}
   setObjectValuesFromRequest($focus);
   if($_REQUEST['assigntype'] == 'U') {
     $focus->column_fields['assigned_user_id'] = $_REQUEST['assigned_user_id'];

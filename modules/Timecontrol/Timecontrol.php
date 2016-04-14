@@ -126,6 +126,21 @@ class Timecontrol extends CRMEntity {
 		}
 	}
 
+	function retrieve_entity_info($record, $module) {
+		parent::retrieve_entity_info($record, $module);
+		// we format the time fields depending on the current user's timezone
+		if (!empty($this->column_fields['date_start']) and !empty($this->column_fields['time_start'])) {
+			$time_start = DateTimeField::convertToUserTimeZone($this->column_fields['date_start'].' '.$this->column_fields['time_start']);
+			$ts = $time_start->format('H:i:s');
+			$this->column_fields['time_start'] = $ts;
+		}
+		if (!empty($this->column_fields['date_end']) and !empty($this->column_fields['time_end'])) {
+			$time_end = DateTimeField::convertToUserTimeZone($this->column_fields['date_end'].' '.$this->column_fields['time_end']);
+			$te = $time_end->format('H:i:s');
+			$this->column_fields['time_end'] = $te;
+		}
+	}
+
 	function save_module($module) {
 		if ($this->HasDirectImageField) {
 			$this->insertIntoAttachment($this->id,$module);
@@ -569,6 +584,7 @@ class Timecontrol extends CRMEntity {
 			// TODO Handle post installation actions
 			$this->setModuleSeqNumber('configure', $modulename, 'TIME-BILLING-', '000001');
 			$em->registerHandler('corebos.filter.CalendarModule.save', 'modules/Timecontrol/TCCalendarHandler.php', 'TCCalendarHandler');
+			$em->registerHandler('corebos.filter.listview.render', 'modules/Task/convertTZListView.php', 'convertTZListView');
 			self::addTSRelations();
 		} else if($event_type == 'module.disabled') {
 			// TODO Handle actions when this module is disabled.
@@ -589,6 +605,7 @@ class Timecontrol extends CRMEntity {
 			$adb->query("ALTER TABLE vtiger_timecontrol CHANGE invoiced invoiced VARCHAR(3) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0'");
 			$adb->query("UPDATE vtiger_timecontrol SET `invoiced`=0 WHERE invoiced!=1 or invoiced is null");
 			$em->registerHandler('corebos.filter.CalendarModule.save', 'modules/Timecontrol/TCCalendarHandler.php', 'TCCalendarHandler');
+			$em->registerHandler('corebos.filter.listview.render', 'modules/Task/convertTZListView.php', 'convertTZListView');
 		}
 	}
 
