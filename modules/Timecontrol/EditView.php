@@ -31,6 +31,7 @@ if($isduplicate == 'true') {
 	$focus->id = '';
 	$focus->mode = '';
 }
+$focus->preEditCheck($_REQUEST,$smarty);
 if ($isduplicate=='restart') {
   $focus->id = '';
   $focus->mode = '';
@@ -44,7 +45,7 @@ if ($isduplicate=='restart') {
   $focus->column_fields['tcunits'] = 1;
   $focus->column_fields['totaltime'] = '';
 }
-$focus->preEditCheck($_REQUEST,$smarty);
+
 if (!empty($_REQUEST['save_error']) and $_REQUEST['save_error'] == "true") {
 	if (!empty($_REQUEST['encode_val'])) {
 		global $current_user;

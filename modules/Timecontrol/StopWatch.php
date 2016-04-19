@@ -29,6 +29,7 @@ if (empty($record)) die();
 
 $focus->id = $record;
 $focus->retrieve_entity_info($record, $currentModule);
+$focus->preViewCheck($_REQUEST,$smarty);
 
 // Identify this module as custom module.
 $smarty->assign('CUSTOM_MODULE', true);

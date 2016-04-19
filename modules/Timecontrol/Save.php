@@ -20,27 +20,18 @@ if ($_REQUEST['stop_watch']) {
   foreach($focus->column_fields as $fieldname => $val) {
 	$focus->column_fields[$fieldname] = decode_html($focus->column_fields[$fieldname]);
   }
+  
   $date = new DateTimeField(null);
   $focus->column_fields['date_end'] = $date->getDisplayDate($current_user);
   $focus->column_fields['time_end'] = $date->getDisplayTime($current_user);
+	$dt = new DateTimeField($focus->column_fields['date_end']);
+	$fmtdt = $dt->convertToDBFormat($focus->column_fields['date_end']);
+	$time_end = DateTimeField::convertToDBTimeZone($fmtdt.' '.$focus->column_fields['time_end']);
+	$te = $time_end->format('H:i:s');
+	$focus->column_fields['time_end'] = $te;
   $focus->column_fields['description'] = decode_html($focus->column_fields['description']);
 }
 else {
-	// We set the time fields to DB format
-	if (!empty($_REQUEST['date_start']) and !empty($_REQUEST['time_start'])) {
-		$dt = new DateTimeField($_REQUEST['date_start']);
-		$fmtdt = $dt->convertToDBFormat($_REQUEST['date_start']);
-		$time_start = DateTimeField::convertToDBTimeZone($fmtdt.' '.$_REQUEST['time_start']);
-		$ts = $time_start->format('H:i:s');
-		$_REQUEST['time_start'] = $ts;
-	}
-	if (!empty($_REQUEST['date_end']) and !empty($_REQUEST['time_end'])) {
-		$dt = new DateTimeField($_REQUEST['date_end']);
-		$fmtdt = $dt->convertToDBFormat($_REQUEST['date_end']);
-		$time_end = DateTimeField::convertToDBTimeZone($fmtdt.' '.$_REQUEST['time_end']);
-		$te = $time_end->format('H:i:s');
-		$_REQUEST['time_end'] = $te;
-	}
   setObjectValuesFromRequest($focus);
   if($_REQUEST['assigntype'] == 'U') {
     $focus->column_fields['assigned_user_id'] = $_REQUEST['assigned_user_id'];

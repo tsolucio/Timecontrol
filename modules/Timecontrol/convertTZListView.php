@@ -27,14 +27,14 @@ class convertTZListViewOnTimecontrol extends VTEventHandler {
 			// 0 -> Row
 			// 1 -> complete Data from Query
 			// 2 -> recordID
-			$tspos = $tepos = $tfpos = -1;
+			$tspos = $tepos = -1;
 			for ($cpos=0;$cpos<count($parameter[0])-1;$cpos++) {
 				if (strpos($parameter[0][$cpos], "vtfieldname='time_start'")>0) $tspos = $cpos;
 				if (strpos($parameter[0][$cpos], "vtfieldname='time_end'")>0) $tepos = $cpos;
 			}
 			if ($tspos!=-1 and !empty($parameter[1]['time_start'])) {
 				if (!isset($parameter[1]['date_start'])) {
-					$tkrs = $adb->pquery('select date_start,date_end from vtiger_task where taskid=?',array($parameter[2]));
+					$tkrs = $adb->pquery('select date_start,date_end from vtiger_timecontrol where timecontrolid=?',array($parameter[2]));
 					$parameter[1]['date_start'] = $adb->query_result($tkrs, 0, 'date_start');
 					$parameter[1]['date_end'] = $adb->query_result($tkrs, 0, 'date_end');
 				}
@@ -44,7 +44,7 @@ class convertTZListViewOnTimecontrol extends VTEventHandler {
 			}
 			if ($tepos!=-1 and !empty($parameter[1]['time_end'])) {
 				if (!isset($parameter[1]['date_end'])) {
-					$tkrs = $adb->pquery('select date_end from vtiger_task where taskid=?',array($parameter[2]));
+					$tkrs = $adb->pquery('select date_end from vtiger_timecontrol where timecontrolid=?',array($parameter[2]));
 					$parameter[1]['date_end'] = $adb->query_result($tkrs, 0, 'date_end');
 				}
 				$time_start = DateTimeField::convertToUserTimeZone($parameter[1]['date_end'].' '.$parameter[1]['time_end']);

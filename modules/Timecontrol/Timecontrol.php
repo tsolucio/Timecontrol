@@ -126,8 +126,7 @@ class Timecontrol extends CRMEntity {
 		}
 	}
 
-	function retrieve_entity_info($record, $module) {
-		parent::retrieve_entity_info($record, $module);
+	function standarizetimefields() {
 		// we format the time fields depending on the current user's timezone
 		if (!empty($this->column_fields['date_start']) and !empty($this->column_fields['time_start'])) {
 			$time_start = DateTimeField::convertToUserTimeZone($this->column_fields['date_start'].' '.$this->column_fields['time_start']);
@@ -138,6 +137,49 @@ class Timecontrol extends CRMEntity {
 			$time_end = DateTimeField::convertToUserTimeZone($this->column_fields['date_end'].' '.$this->column_fields['time_end']);
 			$te = $time_end->format('H:i:s');
 			$this->column_fields['time_end'] = $te;
+		}
+	}
+
+	function preEditCheck($request, $smarty) {
+		$this->standarizetimefields();
+	}
+
+	function preViewCheck($request, $smarty) {
+		$this->standarizetimefields();
+	}
+
+	function preSaveCheck($request) {
+		// We set the time fields to DB format
+		$convertAll = false;
+		$convertTS = false;
+		$convertTE = false;
+		if(!$request['stop_watch']){
+			if($request['action'] == 'TimecontrolAjax'){
+				switch ($request['fldName']) {
+					case 'time_start':
+						$convertTS = true;
+						break;
+					case 'time_end':
+						$convertTE = true;
+						break;
+				}
+			}else{
+				$convertAll = true;
+			}
+			if (($convertAll || $convertTS) && (!empty($this->column_fields['date_start']) and !empty($this->column_fields['time_start']))) {
+				$dt = new DateTimeField($this->column_fields['date_start']);
+				$fmtdt = $dt->convertToDBFormat($this->column_fields['date_start']);
+				$time_start = DateTimeField::convertToDBTimeZone($fmtdt.' '.$this->column_fields['time_start']);
+				$ts = $time_start->format('H:i:s');
+				$this->column_fields['time_start'] = $ts;
+			}
+			if (($convertAll || $convertTE) && (!empty($this->column_fields['date_end']) and !empty($this->column_fields['time_end']))) {
+				$dt = new DateTimeField($this->column_fields['date_end']);
+				$fmtdt = $dt->convertToDBFormat($this->column_fields['date_end']);
+				$time_end = DateTimeField::convertToDBTimeZone($fmtdt.' '.$this->column_fields['time_end']);
+				$te = $time_end->format('H:i:s');
+				$this->column_fields['time_end'] = $te;
+			}
 		}
 	}
 
@@ -186,11 +228,14 @@ class Timecontrol extends CRMEntity {
 	    if (strpos($this->column_fields['totaltime'], ':')) { // tenemos formato h:m:s, lo paso a minutos
 	      $tt = explode(':', $this->column_fields['totaltime']);
 	      $this->column_fields['totaltime'] = $tt[0]*60+$tt[1];
-	    } elseif (strpos($totaltime, '.') or strpos($totaltime, ',')) { // tenemos formato decimal proporcional, lo paso a minutos
+	    } elseif (strpos($totaltime, '.') !== false or strpos($totaltime, ',') !== false) { // tenemos formato decimal proporcional, lo paso a minutos
 	      $tt = preg_split( "/[.,]/", $totaltime);
 	      $mins = round(('0.'.$tt[1])*60,0);
-	      $totaltime = $tt[0].':'.$mins;
-	      $this->column_fields['totaltime'] = $tt[0]*60+$mins;
+		  $tt0 = $tt[0];
+		  if($tt[0] == '')
+			$tt0 = '0';
+	      $totaltime = $tt0.':'.$mins;
+	      $this->column_fields['totaltime'] = $tt0*60+$mins;
 	    }
 	    $query = "select date_start, time_start, date_end, time_end from vtiger_timecontrol where timecontrolid={$this->id}";
 	    $res = $adb->query($query);
