@@ -228,7 +228,7 @@ class Timecontrol extends CRMEntity {
 	    if (strpos($this->column_fields['totaltime'], ':')) { // tenemos formato h:m:s, lo paso a minutos
 	      $tt = explode(':', $this->column_fields['totaltime']);
 	      $this->column_fields['totaltime'] = $tt[0]*60+$tt[1];
-	    } elseif (strpos($totaltime, '.') !== false or strpos($totaltime, ',') !== false) { // tenemos formato decimal proporcional, lo paso a minutos
+	    } elseif (is_numeric($totaltime) && (strpos($totaltime, '.') !== false or strpos($totaltime, ',') !== false)) { // tenemos formato decimal proporcional, lo paso a minutos
 	      $tt = preg_split( "/[.,]/", $totaltime);
 	      $mins = round(('0.'.$tt[1])*60,0);
 		  $tt0 = $tt[0];
@@ -236,7 +236,13 @@ class Timecontrol extends CRMEntity {
 			$tt0 = '0';
 	      $totaltime = $tt0.':'.$mins;
 	      $this->column_fields['totaltime'] = $tt0*60+$mins;
-	    }
+		} elseif (is_numeric($totaltime)){
+			$totaltime = $totaltime.':00';
+			$this->column_fields['totaltime'] = $totaltime*60;
+		}else{
+			$totaltime = '00:00';
+			$this->column_fields['totaltime'] = 0;
+		}
 	    $query = "select date_start, time_start, date_end, time_end from vtiger_timecontrol where timecontrolid={$this->id}";
 	    $res = $adb->query($query);
 	    $date = $adb->query_result($res, 0, 'date_start');
