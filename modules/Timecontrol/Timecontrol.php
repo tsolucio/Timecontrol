@@ -231,14 +231,14 @@ class Timecontrol extends CRMEntity {
 	    } elseif (strpos($totaltime, '.') !== false or strpos($totaltime, ',') !== false) { // tenemos formato decimal proporcional, lo paso a minutos
 	      $tt = preg_split( "/[.,]/", $totaltime);
 	      $mins = round(('0.'.$tt[1])*60,0);
-		  $tt0 = $tt[0];
+		  $tt0 = substr('0'.$tt[0],-2);
 		  if($tt[0] == '')
 			$tt0 = '0';
 	      $ttmin = $tt0*60+$mins;
 	      $totaltime = $tt0.':'.$mins;
 		} elseif (is_numeric($totaltime)){
 			$ttmin = $totaltime*60;
-			$totaltime = $totaltime.':00';
+			$totaltime = substr('0'.$totaltime,-2).':00';
 		}else{
 			$ttmin = 0;
 			$totaltime = '00:00';
