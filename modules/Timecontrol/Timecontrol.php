@@ -228,28 +228,29 @@ class Timecontrol extends CRMEntity {
 	    if (strpos($this->column_fields['totaltime'], ':')) { // tenemos formato h:m:s, lo paso a minutos
 	      $tt = explode(':', $this->column_fields['totaltime']);
 	      $this->column_fields['totaltime'] = $tt[0]*60+$tt[1];
-	    } elseif (is_numeric($totaltime) && (strpos($totaltime, '.') !== false or strpos($totaltime, ',') !== false)) { // tenemos formato decimal proporcional, lo paso a minutos
+	    } elseif (strpos($totaltime, '.') !== false or strpos($totaltime, ',') !== false) { // tenemos formato decimal proporcional, lo paso a minutos
 	      $tt = preg_split( "/[.,]/", $totaltime);
 	      $mins = round(('0.'.$tt[1])*60,0);
 		  $tt0 = $tt[0];
 		  if($tt[0] == '')
 			$tt0 = '0';
+	      $ttmin = $tt0*60+$mins;
 	      $totaltime = $tt0.':'.$mins;
-	      $this->column_fields['totaltime'] = $tt0*60+$mins;
 		} elseif (is_numeric($totaltime)){
+			$ttmin = $totaltime*60;
 			$totaltime = $totaltime.':00';
-			$this->column_fields['totaltime'] = $totaltime*60;
 		}else{
+			$ttmin = 0;
 			$totaltime = '00:00';
-			$this->column_fields['totaltime'] = 0;
 		}
+		$this->column_fields['totaltime'] = $totaltime;
 	    $query = "select date_start, time_start, date_end, time_end from vtiger_timecontrol where timecontrolid={$this->id}";
 	    $res = $adb->query($query);
 	    $date = $adb->query_result($res, 0, 'date_start');
 	    $time = $adb->query_result($res, 0, 'time_start');
 	    list($year, $month, $day) = explode('-', $date);
 	    list($hour, $minute, $seconds) = explode(':', $time);
-	    $endtime = mktime($hour, $minute+$this->column_fields['totaltime'], $seconds, $month, $day, $year);
+	    $endtime = mktime($hour, $minute+$ttmin, $seconds, $month, $day, $year);
 	    $datetimefield = new DateTimeField(date('Y-m-d', $endtime));
 	    $this->column_fields['date_end'] = $datetimefield->getDisplayDate();
 	    $this->column_fields['time_end'] = date('H:i:s', $endtime);
