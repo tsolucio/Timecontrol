@@ -227,7 +227,7 @@ class Timecontrol extends CRMEntity {
 	  	$totaltime = $this->column_fields['totaltime'];
 	    if (strpos($this->column_fields['totaltime'], ':')) { // tenemos formato h:m:s, lo paso a minutos
 	      $tt = explode(':', $this->column_fields['totaltime']);
-	      $this->column_fields['totaltime'] = $tt[0]*60+$tt[1];
+	      $ttmin = $this->column_fields['totaltime'] = $tt[0]*60+$tt[1];
 	    } elseif (strpos($totaltime, '.') !== false or strpos($totaltime, ',') !== false) { // tenemos formato decimal proporcional, lo paso a minutos
 	      $tt = preg_split( "/[.,]/", $totaltime);
 	      $mins = round(('0.'.$tt[1])*60,0);
