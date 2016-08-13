@@ -16,7 +16,7 @@ class Timecontrol extends CRMEntity {
 	// Variable to esablish start value on resume
 	// true: dates and start time will be set to "now"
 	// false: only start time will be set to "now"
-	var $now_on_resume=true;
+	public static $now_on_resume=true;
 	var $USE_RTE = 'true';
 	var $sumup_HelpDesk = true;
 	var $sumup_ProjectTask = true;

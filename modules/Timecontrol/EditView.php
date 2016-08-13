@@ -7,212 +7,66 @@
  * Portions created by vtiger are Copyright (C) vtiger.
  * All Rights Reserved.
  ************************************************************************************/
-global $app_strings, $mod_strings, $current_language, $currentModule, $theme, $adb;
-require_once('Smarty_setup.php');
-
-$focus = CRMEntity::getInstance($currentModule);
-$smarty = new vtigerCRM_Smarty();
-
-$category = getParentTab($currentModule);
+include_once 'modules/Timecontrol/Timecontrol.php';
 $record = vtlib_purify($_REQUEST['record']);
 $isduplicate = vtlib_purify($_REQUEST['isDuplicate']);
-
-//added to fix the issue4600
-$searchurl = getBasic_Advance_SearchURL();
-$smarty->assign("SEARCH", $searchurl);
-//4600 ends
-
-if($record) {
-	$focus->id = $record;
-	$focus->mode = 'edit';
-	$focus->retrieve_entity_info($record, $currentModule);
-}
-if($isduplicate == 'true') {
-	$focus->id = '';
-	$focus->mode = '';
-}
-$focus->preEditCheck($_REQUEST,$smarty);
-if ($isduplicate=='restart') {
-  $focus->id = '';
-  $focus->mode = '';
-  $vtnow=new DateTimeField(null);
-  $focus->column_fields['time_start'] = $vtnow->getDisplayTime($current_user);
-  $focus->column_fields['time_end'] = '';
-  if ($focus->now_on_resume) {
-  	$focus->column_fields['date_start'] = $vtnow->getDBInsertDateValue($current_user);
-  	$focus->column_fields['date_end'] = $vtnow->getDBInsertDateValue($current_user);
-  }
-  $focus->column_fields['tcunits'] = 1;
-  $focus->column_fields['totaltime'] = '';
-}
-
-if (!empty($_REQUEST['save_error']) and $_REQUEST['save_error'] == "true") {
-	if (!empty($_REQUEST['encode_val'])) {
-		global $current_user;
-		$encode_val = vtlib_purify($_REQUEST['encode_val']);
-		$decode_val = base64_decode($encode_val);
-		$explode_decode_val = explode('&', trim($decode_val,'&'));
-		$tabid = getTabid($currentModule);
-		foreach ($explode_decode_val as $fieldvalue) {
-			$value = explode("=", $fieldvalue);
-			$field_name_val = $value[0];
-			$field_value =urldecode($value[1]);
-			$finfo = VTCacheUtils::lookupFieldInfo($tabid, $field_name_val);
-			if ($finfo !== false) {
-				switch ($finfo['uitype']) {
-					case '56':
-						$field_value = $field_value=='on' ? '1' : '0';
-						break;
-					case '7':
-					case '9':
-					case '72':
-						$field_value = CurrencyField::convertToDBFormat($field_value, null, true);
-						break;
-					case '71':
-						$field_value = CurrencyField::convertToDBFormat($field_value);
-						break;
-					case '33':
-					case '3313':
-						if (is_array($field_value)) {
-							$field_value = implode(' |##| ', $field_value);
-						}
-						break;
-				}
-			}
-			$focus->column_fields[$field_name_val] = $field_value;
-		}
+if (!empty($_REQUEST['calendarrecord'])) { // coming from Calendar
+	require_once 'modules/Calendar/Calendar.php';
+	$c4y = CRMEntity::getInstance('Calendar');
+	$c4yrecord = vtlib_purify($_REQUEST['calendarrecord']);
+	$c4y->id = vtlib_purify($c4yrecord);
+	$activity_mode = vtlib_purify($_REQUEST['activity_mode']);
+	$c4y->retrieve_entity_info($c4yrecord, ($activity_mode == 'Task' ? 'Calendar' : 'Events'));
+	$_REQUEST['title'] = getTranslatedString($c4y->column_fields['activitytype'],'Calendar').' :: '.$c4y->column_fields['subject'];
+	$_REQUEST['date_start'] = $c4y->column_fields['date_start'];
+	$_REQUEST['time_start'] = $c4y->column_fields['time_start'];
+	$_REQUEST['date_end'] = $c4y->column_fields['due_date'];
+	if ($activity_mode == 'Task') {
+		$vtnow=new DateTimeField(null);
+		$_REQUEST['time_end'] = $vtnow->getDisplayTime($current_user);
+	} else {
+		$_REQUEST['time_end'] = $c4y->column_fields['time_end'];
 	}
-	$errormessageclass = isset($_REQUEST['error_msgclass']) ? vtlib_purify($_REQUEST['error_msgclass']) : '';
-	$errormessage = isset($_REQUEST['error_msg']) ? vtlib_purify($_REQUEST['error_msg']) : '';
-	$smarty->assign('ERROR_MESSAGE_CLASS', $errormessageclass);
-	$smarty->assign('ERROR_MESSAGE', $errormessage);
-} elseif($focus->mode != 'edit'){
- if (!empty($_REQUEST['calendarrecord'])) { // coming from Calendar (4You)
- 	require_once 'modules/Calendar/Calendar.php';
- 	$c4y = CRMEntity::getInstance('Calendar');
- 	$c4yrecord = vtlib_purify($_REQUEST['calendarrecord']);
- 	$c4y->id = vtlib_purify($c4yrecord);
- 	$activity_mode = vtlib_purify($_REQUEST['activity_mode']);
- 	$c4y->retrieve_entity_info($c4yrecord, ($activity_mode == 'Task' ? 'Calendar' : 'Events'));
- 	$focus->column_fields['title'] = getTranslatedString($c4y->column_fields['activitytype'],'Calendar').' :: '.$c4y->column_fields['subject'];
- 	$focus->column_fields['date_start'] = $c4y->column_fields['date_start'];
- 	$focus->column_fields['time_start'] = $c4y->column_fields['time_start'];
- 	$focus->column_fields['date_end'] = $c4y->column_fields['due_date'];
- 	if ($activity_mode == 'Task') {
- 		$vtnow=new DateTimeField(null);
- 		$focus->column_fields['time_end'] = $vtnow->getDisplayTime($current_user);
- 	} else {
- 		$focus->column_fields['time_end'] = $c4y->column_fields['time_end'];
- 	}
- 	$focus->column_fields['relatedto'] = $c4y->column_fields['parent_id'];
- 	$focus->column_fields['tcunits'] = 1;
- 	$focus->column_fields['assigned_user_id'] = $c4y->column_fields['assigned_user_id'];
- 	$focus->column_fields['description'] = $c4y->column_fields['description'];
- } else {
-  $vtnow=new DateTimeField(null);
-  $focus->column_fields['time_start'] = $vtnow->getDisplayTime($current_user);
-  $focus->column_fields['date_start'] = $vtnow->getDBInsertDateValue($current_user);
-  $focus->column_fields['date_end'] = $vtnow->getDBInsertDateValue($current_user);
-  $rshd=$adb->pquery('select tcproduct from vtiger_users where id=?',array($current_user->id));
-  if ($rshd) {
-   $tcpdo = $adb->query_result($rshd,0,'tcproduct');
-   if (!empty($tcpdo)) {
-    $focus->column_fields['product_id']=$tcpdo;
-   }
-  }
-  setObjectValuesFromRequest($focus);
+	$_REQUEST['relatedto'] = $c4y->column_fields['parent_id'];
+	$_REQUEST['tcunits'] = 1;
+	$_REQUEST['assigned_user_id'] = $c4y->column_fields['assigned_user_id'];
+	$_REQUEST['description'] = $c4y->column_fields['description'];
+} elseif ($isduplicate=='restart') {
+	$vtnow=new DateTimeField();
+	$_REQUEST['time_start'] = $vtnow->getDisplayTime($current_user);
+	$_REQUEST['time_end'] = '';
+	if (Timecontrol::$now_on_resume) {
+		$_REQUEST['date_start'] = $vtnow->getDBInsertDateValue($current_user);
+		$_REQUEST['date_end'] = $vtnow->getDBInsertDateValue($current_user);
+	}
+	$_REQUEST['tcunits'] = 1;
+	$_REQUEST['totaltime'] = '';
+	$_REQUEST['isDuplicate'] = 'true';
 }
+
+$rsusrpdo=$adb->pquery('select tcproduct from vtiger_users where id=?',array($current_user->id));
+if ($rsusrpdo) {
+	$tcpdo = $adb->query_result($rsusrpdo,0,'tcproduct');
+	if (!empty($tcpdo)) {
+		$_REQUEST['product_id']=$tcpdo;
+	}
 }
 
 // Contribution made by Ted Janzen of Janzen & Janzen ICT Services http://www.j2ict.nl
 $relto = (!empty($_REQUEST['relatedto']) ? vtlib_purify($_REQUEST['relatedto']) : '');
 if (!empty($relto) and getSalesEntityType($relto)=='HelpDesk') { // coming from TT, pickup data
 	$rshd=$adb->pquery('select ticket_no,product_id from vtiger_troubletickets where ticketid=?',array($relto));
-	if (empty($focus->column_fields['product_id'])) {
-		$focus->column_fields['product_id']=$adb->query_result($rshd,0,'product_id');
+	if (empty($_REQUEST['product_id'])) {
+		$_REQUEST['product_id']=$adb->query_result($rshd,0,'product_id');
 	}
-	$focus->column_fields['title']=$adb->query_result($rshd,0,'ticket_no');
+	$_REQUEST['title']=$adb->query_result($rshd,0,'ticket_no');
 }
 
-$disp_view = getView($focus->mode);
-$smarty->assign('BLOCKS', getBlocks($currentModule, $disp_view, $focus->mode, $focus->column_fields));
-$smarty->assign('BASBLOCKS', getBlocks($currentModule, $disp_view, $focus->mode, $focus->column_fields, 'BAS'));
-$smarty->assign('ADVBLOCKS',getBlocks($currentModule,$disp_view,$focus->mode,$focus->column_fields,'ADV'));
-$smarty->assign('OP_MODE',$disp_view);
-$smarty->assign('APP', $app_strings);
-$smarty->assign('MOD', $mod_strings);
-$smarty->assign('MODULE', $currentModule);
-// TODO: Update Single Module Instance name here.
-$smarty->assign('SINGLE_MOD', 'SINGLE_'.$currentModule);
-$smarty->assign('CATEGORY', $category);
-$smarty->assign("THEME", $theme);
-$smarty->assign('IMAGE_PATH', "themes/$theme/images/");
-$smarty->assign('ID', $focus->id);
-$smarty->assign('MODE', $focus->mode);
-$smarty->assign('CREATEMODE', isset($_REQUEST['createmode']) ? vtlib_purify($_REQUEST['createmode']) : '');
+require_once 'modules/Vtiger/EditView.php';
 
-$smarty->assign('CHECK', Button_Check($currentModule));
-$smarty->assign('DUPLICATE', $isduplicate);
-
-if($focus->mode == 'edit' || $isduplicate) {
-	$recordName = array_values(getEntityName($currentModule, $record));
-	$recordName = $recordName[0];
-	$smarty->assign('NAME', $recordName);
-	$smarty->assign('UPDATEINFO',updateInfo($record));
-}
-
-if(isset($_REQUEST['return_module']))    $smarty->assign("RETURN_MODULE", vtlib_purify($_REQUEST['return_module']));
-if(isset($_REQUEST['return_action']))    $smarty->assign("RETURN_ACTION", vtlib_purify($_REQUEST['return_action']));
-if(isset($_REQUEST['return_id']))        $smarty->assign("RETURN_ID", vtlib_purify($_REQUEST['return_id']));
-if (isset($_REQUEST['return_viewname'])) $smarty->assign("RETURN_VIEWNAME", vtlib_purify($_REQUEST['return_viewname']));
-$smarty->assign("UPLOADSIZE", $upload_maxsize/1000000); //Convert to MB
-$smarty->assign("UPLOAD_MAXSIZE",$upload_maxsize);
-
-// Field Validation Information
-$tabid = getTabid($currentModule);
-$validationData = getDBValidationData($focus->tab_name,$tabid);
-$validationArray = split_validationdataArray($validationData);
-
-$smarty->assign("VALIDATION_DATA_FIELDNAME",$validationArray['fieldname']);
-$smarty->assign("VALIDATION_DATA_FIELDDATATYPE",$validationArray['datatype']);
-$smarty->assign("VALIDATION_DATA_FIELDLABEL",$validationArray['fieldlabel']);
-
-// In case you have a date field
-$smarty->assign("CALENDAR_LANG", $app_strings['LBL_JSCALENDAR_LANG']);
-$smarty->assign("CALENDAR_DATEFORMAT", parse_calendardate($app_strings['NTC_DATE_FORMAT']));
-
-// Module Sequence Numbering
-$mod_seq_field = getModuleSequenceField($currentModule);
-if($focus->mode != 'edit' && $mod_seq_field != null) {
-	$autostr = getTranslatedString('MSG_AUTO_GEN_ON_SAVE');
-	list($mod_seq_string, $mod_seq_prefix, $mod_seq_no, $doNative) = cbEventHandler::do_filter('corebos.filter.ModuleSeqNumber.get', array('', '', '', true));
-	if ($doNative) {
-		$mod_seq_string = $adb->pquery("SELECT prefix, cur_id from vtiger_modentity_num where semodule = ? and active=1",array($currentModule));
-		$mod_seq_prefix = $adb->query_result($mod_seq_string,0,'prefix');
-		$mod_seq_no = $adb->query_result($mod_seq_string,0,'cur_id');
-	}
-	if ($adb->num_rows($mod_seq_string) == 0 || $focus->checkModuleSeqNumber($focus->table_name, $mod_seq_field['column'], $mod_seq_prefix.$mod_seq_no)) {
-		$smarty->assign('ERROR_MESSAGE_CLASS', 'cb-alert-warning');
-		$smarty->assign('ERROR_MESSAGE', '<b>'. getTranslatedString($mod_seq_field['label']). ' '. getTranslatedString('LBL_NOT_CONFIGURED')
-			.' - '. getTranslatedString('LBL_PLEASE_CLICK') .' <a href="index.php?module=Settings&action=CustomModEntityNo&parenttab=Settings&selmodule='.$currentModule.'">'.getTranslatedString('LBL_HERE').'</a> '
-			. getTranslatedString('LBL_TO_CONFIGURE'). ' '. getTranslatedString($mod_seq_field['label']) .'</b>');
-	} else {
-		$smarty->assign("MOD_SEQ_ID",$autostr);
-	}
-} else {
-	$smarty->assign("MOD_SEQ_ID", $focus->column_fields[$mod_seq_field['name']]);
-}
-
-// Gather the help information associated with fields
-$smarty->assign('FIELDHELPINFO', vtlib_getFieldHelpInfo($currentModule));
-
-$picklistDependencyDatasource = Vtiger_DependencyPicklist::getPicklistDependencyDatasource($currentModule);
-$smarty->assign("PICKIST_DEPENDENCY_DATASOURCE", Zend_Json::encode($picklistDependencyDatasource));
-$smarty->assign('USE_RTE', $focus->USE_RTE);
 if($focus->mode == 'edit') {
 	$smarty->display('salesEditView.tpl');
 } else {
 	$smarty->display('CreateView.tpl');
 }
-
 ?>
