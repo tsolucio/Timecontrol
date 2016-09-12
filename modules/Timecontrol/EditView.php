@@ -42,6 +42,16 @@ if (!empty($_REQUEST['calendarrecord'])) { // coming from Calendar
 	$_REQUEST['tcunits'] = 1;
 	$_REQUEST['totaltime'] = '';
 	$_REQUEST['isDuplicate'] = 'true';
+} elseif (empty($record)) { // creating
+	$cbnow=new DateTimeField(null);
+	$_REQUEST['time_start'] = $cbnow->getDisplayTime($current_user);
+	$rshd=$adb->pquery('select tcproduct from vtiger_users where id=?',array($current_user->id));
+	if ($rshd) {
+		$tcpdo = $adb->query_result($rshd,0,'tcproduct');
+		if (!empty($tcpdo)) {
+			$_REQUEST['product_id']=$tcpdo;
+		}
+	}
 }
 
 $rsusrpdo=$adb->pquery('select tcproduct from vtiger_users where id=?',array($current_user->id));
