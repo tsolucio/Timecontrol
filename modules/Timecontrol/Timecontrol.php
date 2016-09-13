@@ -297,7 +297,7 @@ class Timecontrol extends CRMEntity {
 		$relid=$adb->getone("select relatedto from vtiger_timecontrol where timecontrolid=$tcid");
 		if (empty($relid)) return true;
 		if ($this->sumup_HelpDesk and getSalesEntityType($relid)=='HelpDesk') {
-			$query = "select round(sum(time_to_sec(totaltime))/3600) as stt
+			$query = "select sum(time_to_sec(totaltime))/3600 as stt
 			 from vtiger_timecontrol
 			 inner join vtiger_crmentity on crmid=timecontrolid
 			 where relatedto=$relid and deleted=0";
