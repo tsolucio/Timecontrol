@@ -130,11 +130,13 @@ class Timecontrol extends CRMEntity {
 		// we format the time fields depending on the current user's timezone
 		if (!empty($this->column_fields['date_start']) and !empty($this->column_fields['time_start'])) {
 			$time_start = DateTimeField::convertToUserTimeZone($this->column_fields['date_start'].' '.$this->column_fields['time_start']);
+			$this->column_fields['date_start'] = $time_start->format('Y-m-d');
 			$ts = $time_start->format('H:i:s');
 			$this->column_fields['time_start'] = $ts;
 		}
 		if (!empty($this->column_fields['date_end']) and !empty($this->column_fields['time_end'])) {
 			$time_end = DateTimeField::convertToUserTimeZone($this->column_fields['date_end'].' '.$this->column_fields['time_end']);
+			$this->column_fields['date_end'] = $time_end->format('Y-m-d');
 			$te = $time_end->format('H:i:s');
 			$this->column_fields['time_end'] = $te;
 		}
@@ -170,6 +172,7 @@ class Timecontrol extends CRMEntity {
 				$dt = new DateTimeField($this->column_fields['date_start']);
 				$fmtdt = $dt->convertToDBFormat($this->column_fields['date_start']);
 				$time_start = DateTimeField::convertToDBTimeZone($fmtdt.' '.$this->column_fields['time_start']);
+				$this->column_fields['date_start'] = $time_start->format('Y-m-d');
 				$ts = $time_start->format('H:i:s');
 				$this->column_fields['time_start'] = $ts;
 			}
@@ -177,6 +180,7 @@ class Timecontrol extends CRMEntity {
 				$dt = new DateTimeField($this->column_fields['date_end']);
 				$fmtdt = $dt->convertToDBFormat($this->column_fields['date_end']);
 				$time_end = DateTimeField::convertToDBTimeZone($fmtdt.' '.$this->column_fields['time_end']);
+				$this->column_fields['date_end'] = $time_end->format('Y-m-d');
 				$te = $time_end->format('H:i:s');
 				$this->column_fields['time_end'] = $te;
 			}
