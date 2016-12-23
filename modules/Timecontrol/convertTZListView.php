@@ -29,8 +29,20 @@ class convertTZListViewOnTimecontrol extends VTEventHandler {
 			// 2 -> recordID
 			$tspos = $tepos = -1;
 			for ($cpos=0;$cpos<count($parameter[0])-1;$cpos++) {
+				if (strpos($parameter[0][$cpos], "vtfieldname='date_start'")>0) $dspos = $cpos;
 				if (strpos($parameter[0][$cpos], "vtfieldname='time_start'")>0) $tspos = $cpos;
+				if (strpos($parameter[0][$cpos], "vtfieldname='date_end'")>0) $depos = $cpos;
 				if (strpos($parameter[0][$cpos], "vtfieldname='time_end'")>0) $tepos = $cpos;
+			}
+			if ($dspos!=-1 and !empty($parameter[1]['date_start'])) {
+				if (!isset($parameter[1]['time_start'])) {
+					$tkrs = $adb->pquery('select time_start from vtiger_timecontrol where timecontrolid=?',array($parameter[2]));
+					$parameter[1]['time_start'] = $adb->query_result($tkrs, 0, 'time_start');
+				}
+				$time_start = DateTimeField::convertToUserTimeZone($parameter[1]['date_start'].' '.$parameter[1]['time_start']);
+				$ds = $time_start->format('Y-m-d');
+				$display_ds = DateTimeField::convertToUserFormat($ds);
+				$parameter[0][$dspos] = $display_ds . substr($parameter[0][$dspos], strpos($parameter[0][$dspos],' <span'));
 			}
 			if ($tspos!=-1 and !empty($parameter[1]['time_start'])) {
 				if (!isset($parameter[1]['date_start'])) {
@@ -41,6 +53,16 @@ class convertTZListViewOnTimecontrol extends VTEventHandler {
 				$time_start = DateTimeField::convertToUserTimeZone($parameter[1]['date_start'].' '.$parameter[1]['time_start']);
 				$ts = $time_start->format('H:i:s');
 				$parameter[0][$tspos] = $ts . substr($parameter[0][$tspos], strpos($parameter[0][$tspos],' <span'));
+			}
+			if ($depos!=-1 and !empty($parameter[1]['date_end'])) {
+				if (!isset($parameter[1]['time_end'])) {
+					$tkrs = $adb->pquery('select time_end from vtiger_timecontrol where timecontrolid=?',array($parameter[2]));
+					$parameter[1]['time_end'] = $adb->query_result($tkrs, 0, 'time_end');
+				}
+				$time_end = DateTimeField::convertToUserTimeZone($parameter[1]['date_end'].' '.$parameter[1]['time_end']);
+				$de = $time_end->format('Y-m-d');
+				$display_de = DateTimeField::convertToUserFormat($de);
+				$parameter[0][$depos] = $display_de . substr($parameter[0][$depos], strpos($parameter[0][$depos],' <span'));
 			}
 			if ($tepos!=-1 and !empty($parameter[1]['time_end'])) {
 				if (!isset($parameter[1]['date_end'])) {
