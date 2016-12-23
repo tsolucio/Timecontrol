@@ -74,9 +74,5 @@ if (!empty($relto) and getSalesEntityType($relto)=='HelpDesk') { // coming from 
 
 require_once 'modules/Vtiger/EditView.php';
 
-if($focus->mode == 'edit') {
-	$smarty->display('salesEditView.tpl');
-} else {
-	$smarty->display('CreateView.tpl');
-}
+$smarty->display('salesEditView.tpl');
 ?>
