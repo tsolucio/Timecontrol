@@ -16,8 +16,13 @@ require_once 'modules/Vtiger/DetailView.php';
 if ($focus->column_fields['date_end']=='') {
 	$date = $focus->column_fields['date_start'];
 	$time = $focus->column_fields['time_start'];
-	list($year, $month, $day) = split('-', $date);
-	list($hour, $minute) = split(':', $time);
+	$array_date = explode('-', $date);
+	$year = $array_date[0];
+	$month = $array_date[1];
+	$day = $array_date[2];
+	$array_time = explode(':', $time);
+	$hour = $array_time[0];
+	$minute = $array_time[1];
 	$starttime = mktime($hour, $minute, 0, $month, $day, $year);
 	$counter = time()-$starttime;
 	$smarty->assign('SHOW_WATCH', 'started');
