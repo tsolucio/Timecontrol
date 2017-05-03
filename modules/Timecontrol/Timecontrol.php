@@ -187,10 +187,10 @@ class Timecontrol extends CRMEntity {
 			$enum=$relm->column_fields[$seqfld['column']];
 			$ename=getEntityName($relmod, array($this->column_fields['relatedto']));
 			$ename=decode_html($ename[$this->column_fields['relatedto']]);
-			$this->db->query("update vtiger_timecontrol set relatednum='$enum', relatedname='$ename' where timecontrolid=".$this->id);
+			$this->db->pquery('update vtiger_timecontrol set relatednum=?, relatedname=? where timecontrolid=?',array($enum,$ename,$this->id));
 		}
 	}
-	
+
 	/** Update totaltime field */
 	function updateTimesheetTotalTime() {
 	  global $adb;
