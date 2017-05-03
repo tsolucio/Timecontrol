@@ -8,8 +8,8 @@
  * All Rights Reserved.
  ************************************************************************************/
 include_once 'modules/Timecontrol/Timecontrol.php';
-$record = vtlib_purify($_REQUEST['record']);
-$isduplicate = vtlib_purify($_REQUEST['isDuplicate']);
+$record = (isset($_REQUEST['record']) ? vtlib_purify($_REQUEST['record']) : 0);
+$isduplicate = (isset($_REQUEST['isDuplicate']) ? vtlib_purify($_REQUEST['isDuplicate']) : '');
 if (!empty($_REQUEST['calendarrecord'])) { // coming from Calendar
 	require_once 'modules/Calendar/Calendar.php';
 	$c4y = CRMEntity::getInstance('Calendar');

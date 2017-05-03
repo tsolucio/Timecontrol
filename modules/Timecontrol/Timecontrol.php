@@ -141,7 +141,7 @@ class Timecontrol extends CRMEntity {
 		$convertAll = false;
 		$convertTS = false;
 		$convertTE = false;
-		if(!$request['stop_watch']){
+		if (empty($request['stop_watch'])) {
 			if($request['action'] == 'TimecontrolAjax'){
 				switch ($request['fldName']) {
 					case 'time_start':
