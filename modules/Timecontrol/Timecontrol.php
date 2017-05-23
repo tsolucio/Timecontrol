@@ -420,7 +420,7 @@ class Timecontrol extends CRMEntity {
 		foreach ($cfgTCMods as $tcmod) {
 			$rtcModule = Vtiger_Module::getInstance($tcmod);
 			$rtcModule->setRelatedList($module, 'Timecontrol', Array('ADD'), 'get_dependents_list');
-			$rtcModule->addLink('DETAILVIEWBASIC', 'Timecontrol', 'index.php?module=Timecontrol&action=EditView&relatedto=$RECORD$','modules/Timecontrol/images/stopwatch.gif');
+			$rtcModule->addLink('DETAILVIEWBASIC', 'Timecontrol', 'index.php?module=Timecontrol&action=EditView&createmode=link&return_id=$RECORD$&return_action=DetailView&return_module=$MODULE$&cbfromid=$RECORD$&relatedto=$RECORD$','modules/Timecontrol/images/stopwatch.gif');
 		}
 	}
 
