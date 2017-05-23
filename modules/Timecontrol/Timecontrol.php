@@ -293,8 +293,8 @@ class Timecontrol extends CRMEntity {
 			 where relatedto=$relid and deleted=0";
 			$res = $adb->query($query);
 			$stt = $adb->query_result($res, 0, 'stt');
-			$query = "update vtiger_troubletickets set hours='$stt' where ticketid=$relid";
-			$adb->query($query);
+			$query = 'update vtiger_troubletickets set hours=? where ticketid=?';
+			$adb->pquery($query,array((empty($stt) ? 0 : $stt),$relid));
 		}
 		if ($this->sumup_ProjectTask and getSalesEntityType($relid)=='ProjectTask') {
 			$query = "select sec_to_time(sum(time_to_sec(totaltime))) as stt
@@ -303,8 +303,8 @@ class Timecontrol extends CRMEntity {
 			where relatedto=$relid and deleted=0";
 			$res = $adb->query($query);
 			$stt = $adb->query_result($res, 0, 'stt');
-			$query = "update vtiger_projecttask set projecttaskhours='$stt' where projecttaskid=$relid";
-			$adb->query($query);
+			$query = 'update vtiger_projecttask set projecttaskhours=? where projecttaskid=?';
+			$adb->pquery($query,array((empty($stt) ? 0 : $stt),$relid));
 		}
 	}
 
