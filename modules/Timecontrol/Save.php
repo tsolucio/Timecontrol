@@ -12,7 +12,12 @@ global $current_user, $currentModule, $singlepane_view;
 checkFileAccessForInclusion("modules/$currentModule/$currentModule.php");
 require_once("modules/$currentModule/$currentModule.php");
 
-$search = isset($_REQUEST['search_url']) ? urlencode(vtlib_purify($_REQUEST['search_url'])) : '';
+if (isset($_REQUEST['search_url'])) {
+	$search = vtlib_purify($_REQUEST['search_url']);
+	if (substr($search, 0, 1) != '&') $search = '&' . $search;
+} else {
+	$search = '';
+}
 $req = new Vtiger_Request();
 $req->setDefault('return_module',$currentModule);
 if(!empty($_REQUEST['return_module'])) {
@@ -59,7 +64,7 @@ else {
   }
 }
 
-$mode = vtlib_purify($_REQUEST['mode']);
+$mode = (isset($_REQUEST['mode']) ? vtlib_purify($_REQUEST['mode']) : '');
 $record=vtlib_purify($_REQUEST['record']);
 if($mode) $focus->mode = $mode;
 if($record)$focus->id  = $record;
@@ -105,6 +110,10 @@ if(isset($_REQUEST['return_id']) && $_REQUEST['return_id'] != '') {
 }
 
 if (!isset($__cbSaveSendHeader) || $__cbSaveSendHeader) {
-	header('Location: index.php?' . $req->getReturnURL() . $search);
+	if (isset($_REQUEST['Module_Popup_Edit']) and $_REQUEST['Module_Popup_Edit']==1) {
+		echo "<script>window.close();</script>";
+	} else {
+		header('Location: index.php?' . $req->getReturnURL() . $search);
+	}
 }
 ?>
