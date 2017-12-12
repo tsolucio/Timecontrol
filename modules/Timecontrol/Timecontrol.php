@@ -11,56 +11,58 @@ require_once('data/CRMEntity.php');
 require_once('data/Tracker.php');
 
 class Timecontrol extends CRMEntity {
-	var $db, $log; // Used in class functions of CRMEntity
+	public $db;
+	public $log;
 
 	// Variable to esablish start value on resume
 	// true: dates and start time will be set to "now"
 	// false: only start time will be set to "now"
 	public static $now_on_resume=true;
-	var $sumup_HelpDesk = true;
-	var $sumup_ProjectTask = true;
+	public $sumup_HelpDesk = true;
+	public $sumup_ProjectTask = true;
 
-	var $table_name = 'vtiger_timecontrol';
-	var $table_index= 'timecontrolid';
-	var $column_fields = Array();
+	public $table_name = 'vtiger_timecontrol';
+	public $table_index= 'timecontrolid';
+	public $column_fields = array();
 
 	/** Indicator if this is a custom module or standard module */
-	var $IsCustomModule = true;
-	var $HasDirectImageField = false;
+	public $IsCustomModule = true;
+	public $HasDirectImageField = false;
 	/**
 	 * Mandatory table for supporting custom fields.
 	 */
-	var $customFieldTable = Array('vtiger_timecontrolcf', 'timecontrolid');
-	var $related_tables = Array('vtiger_timecontrolcf'=>array('timecontrolid','vtiger_timecontrol', 'timecontrolid','Timecontrol'));
+	public $customFieldTable = array('vtiger_timecontrolcf', 'timecontrolid');
+	public $related_tables = array('vtiger_timecontrolcf'=>array('timecontrolid','vtiger_timecontrol', 'timecontrolid','Timecontrol'));
 
 	/**
 	 * Mandatory for Saving, Include tables related to this module.
 	 */
-	var $tab_name = Array('vtiger_crmentity', 'vtiger_timecontrol', 'vtiger_timecontrolcf');
+	public $tab_name = array('vtiger_crmentity', 'vtiger_timecontrol', 'vtiger_timecontrolcf');
 
 	/**
 	 * Mandatory for Saving, Include tablename and tablekey columnname here.
 	 */
-	var $tab_name_index = Array(
+	public $tab_name_index = array(
 		'vtiger_crmentity' => 'crmid',
 		'vtiger_timecontrol'   => 'timecontrolid',
-		'vtiger_timecontrolcf' => 'timecontrolid');
+		'vtiger_timecontrolcf' => 'timecontrolid',
+	);
 
 	/**
 	 * Mandatory for Listing (Related listview)
 	 */
-	var $list_fields = Array (
-		/* Format: Field Label => Array(tablename => columnname) */
+	public $list_fields = array (
+		/* Format: Field Label => array(tablename => columnname) */
 		// tablename should not have prefix 'vtiger_'
 		'Timecontrol Number' => array('timecontrol' => 'timecontrolnr'),
-		'Title'=> Array('timecontrol' => 'title'),
+		'Title'=> array('timecontrol' => 'title'),
 		'Date Start' => array('timecontrol' => 'date_start'),
 		'Time Start' => array('timecontrol' => 'time_start'),
 		'Total Time' => array('timecontrol' => 'totaltime'),
-		'Description' => Array('crmentity' => 'description'),
-		'Assigned To' => Array('crmentity' => 'smownerid')
+		'Description' => array('crmentity' => 'description'),
+		'Assigned To' => array('crmentity' => 'smownerid')
 	);
-	var $list_fields_name = Array(
+	public $list_fields_name = array(
 		/* Format: Field Label => fieldname */
 		'Timecontrol Number' => 'timecontrolnr',
 		'Title'=> 'title',
@@ -72,46 +74,46 @@ class Timecontrol extends CRMEntity {
 	);
 
 	// Make the field link to detail view from list view (Fieldname)
-	var $list_link_field = 'timecontrolnr';
+	public $list_link_field = 'timecontrolnr';
 
 	// For Popup listview and UI type support
-	var $search_fields = Array(
-		/* Format: Field Label => Array(tablename => columnname) */
+	public $search_fields = array(
+		/* Format: Field Label => array(tablename => columnname) */
 		// tablename should not have prefix 'vtiger_'
 		'Timecontrol Number' => array('timecontrol' => 'timecontrolnr'),
-		'Title'=> Array('timecontrol' => 'title')
+		'Title'=> array('timecontrol' => 'title')
 	);
-	var $search_fields_name = Array(
+	public $search_fields_name = array(
 		/* Format: Field Label => fieldname */
 		'Timecontrol Number' => 'timecontrolnr',
 		'Title'=> 'title'
 	);
 
 	// For Popup window record selection
-	var $popup_fields = Array('timecontrolnr');
+	public $popup_fields = array('timecontrolnr');
 
 	// Placeholder for sort fields - All the fields will be initialized for Sorting through initSortFields
-	var $sortby_fields = Array();
+	public $sortby_fields = array();
 
 	// For Alphabetical search
-	var $def_basicsearch_col = 'timecontrolnr';
+	public $def_basicsearch_col = 'timecontrolnr';
 
 	// Column value to use on detail view record text display
-	var $def_detailview_recname = 'title';
+	public $def_detailview_recname = 'title';
 
 	// Required Information for enabling Import feature
-	var $required_fields = Array();
+	public $required_fields = array();
 
 	// Callback function list during Importing
-	var $special_functions = Array('set_import_assigned_user');
+	public $special_functions = array('set_import_assigned_user');
 
-	var $default_order_by = 'date_start';
-	var $default_sort_order='DESC';
+	public $default_order_by = 'date_start';
+	public $default_sort_order='DESC';
 	// Used when enabling/disabling the mandatory fields for the module.
 	// Refers to vtiger_field.fieldname values.
-	var $mandatory_fields = Array('createdtime', 'modifiedtime', 'timecontrolnr', 'date_start', 'time_start');
+	public $mandatory_fields = array('createdtime', 'modifiedtime', 'timecontrolnr', 'date_start', 'time_start');
 
-	function standarizetimefields() {
+	public function standarizetimefields() {
 		// we format the time fields depending on the current user's timezone
 		if (!empty($this->column_fields['date_start']) and !empty($this->column_fields['time_start'])) {
 			$time_start = DateTimeField::convertToUserTimeZone($this->column_fields['date_start'].' '.$this->column_fields['time_start']);
@@ -127,15 +129,15 @@ class Timecontrol extends CRMEntity {
 		}
 	}
 
-	function preEditCheck($request, $smarty) {
+	public function preEditCheck($request, $smarty) {
 		$this->standarizetimefields();
 	}
 
-	function preViewCheck($request, $smarty) {
+	public function preViewCheck($request, $smarty) {
 		$this->standarizetimefields();
 	}
 
-	function preSaveCheck($request) {
+	public function preSaveCheck($request) {
 		// We set the time fields to DB format
 		$convertAll = false;
 		$convertTS = false;
@@ -172,7 +174,7 @@ class Timecontrol extends CRMEntity {
 		}
 	}
 
-	function save_module($module) {
+	public function save_module($module) {
 		if ($this->HasDirectImageField) {
 			$this->insertIntoAttachment($this->id,$module);
 		}
@@ -191,7 +193,7 @@ class Timecontrol extends CRMEntity {
 	}
 
 	/** Update totaltime field */
-	function updateTimesheetTotalTime() {
+	public function updateTimesheetTotalTime() {
 	  global $adb;
 	  if (!empty($this->column_fields['date_end']) && !empty($this->column_fields['time_end'])) {
 	    $query = "select date_start, time_start, date_end, time_end from vtiger_timecontrol where timecontrolid={$this->id}";
@@ -281,7 +283,7 @@ class Timecontrol extends CRMEntity {
 	}
 
 	/**     Update Related Entities   */
-	function updateRelatedEntities($tcid) {
+	public function updateRelatedEntities($tcid) {
 		global $adb;
 		$relid=$adb->getone("select relatedto from vtiger_timecontrol where timecontrolid=$tcid");
 		if (empty($relid)) return true;
@@ -307,7 +309,7 @@ class Timecontrol extends CRMEntity {
 		}
 	}
 
-	function trash($module,$record) {
+	public function trash($module,$record) {
 		global $adb;
 		parent::trash($module,$record);
 		self::update_totalday_control($record);
@@ -329,7 +331,7 @@ class Timecontrol extends CRMEntity {
 	 * @param String Module name
 	 * @param String Event Type (module.postinstall, module.disabled, module.enabled, module.preuninstall)
 	 */
-	function vtlib_handler($modulename, $event_type) {
+	public function vtlib_handler($modulename, $event_type) {
 		global $adb;
 		require_once('include/events/include.inc');
 		include_once('vtlib/Vtiger/Module.php');
@@ -340,15 +342,15 @@ class Timecontrol extends CRMEntity {
 			$em->registerHandler('corebos.filter.CalendarModule.save', 'modules/Timecontrol/TCCalendarHandler.php', 'TCCalendarHandler');
 			$em->registerHandler('corebos.filter.listview.render', 'modules/Timecontrol/convertTZListView.php', 'convertTZListViewOnTimecontrol');
 			self::addTSRelations();
-		} else if($event_type == 'module.disabled') {
+		} elseif ($event_type == 'module.disabled') {
 			// TODO Handle actions when this module is disabled.
-		} else if($event_type == 'module.enabled') {
+		} elseif ($event_type == 'module.enabled') {
 			// TODO Handle actions when this module is enabled.
-		} else if($event_type == 'module.preuninstall') {
+		} elseif ($event_type == 'module.preuninstall') {
 			// TODO Handle actions when this module is about to be deleted.
-		} else if($event_type == 'module.preupdate') {
+		} elseif ($event_type == 'module.preupdate') {
 			// TODO Handle actions before this module is updated.
-		} else if($event_type == 'module.postupdate') {
+		} elseif ($event_type == 'module.postupdate') {
 			// TODO Handle actions after this module is updated.
 			$adb->query("update vtiger_field SET typeofdata='D~M', uitype=5 WHERE tablename='vtiger_timecontrol' and columnname='date_start'");
 			$adb->query("update vtiger_field SET typeofdata='D~O', uitype=5 WHERE tablename='vtiger_timecontrol' and columnname='date_end'");
@@ -384,27 +386,27 @@ class Timecontrol extends CRMEntity {
 	 * NOTE: This function has been added to CRMEntity (base class).
 	 * You can override the behavior by re-defining it here.
 	 */
-	// function save_related_module($module, $crmid, $with_module, $with_crmid) { }
+	// public function save_related_module($module, $crmid, $with_module, $with_crmid) { }
 
 	/**
 	 * Handle deleting related module information.
 	 * NOTE: This function has been added to CRMEntity (base class).
 	 * You can override the behavior by re-defining it here.
 	 */
-	//function delete_related_module($module, $crmid, $with_module, $with_crmid) { }
+	//public function delete_related_module($module, $crmid, $with_module, $with_crmid) { }
 
 	/**
 	 * Handle getting related list information.
 	 * NOTE: This function has been added to CRMEntity (base class).
 	 * You can override the behavior by re-defining it here.
 	 */
-	//function get_related_list($id, $cur_tab_id, $rel_tab_id, $actions=false) { }
+	//public function get_related_list($id, $cur_tab_id, $rel_tab_id, $actions=false) { }
 
 	/**
 	 * Handle getting dependents list information.
 	 * NOTE: This function has been added to CRMEntity (base class).
 	 * You can override the behavior by re-defining it here.
 	 */
-	//function get_dependents_list($id, $cur_tab_id, $rel_tab_id, $actions=false) { }
+	//public function get_dependents_list($id, $cur_tab_id, $rel_tab_id, $actions=false) { }
 }
 ?>
