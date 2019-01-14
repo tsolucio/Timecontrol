@@ -7,11 +7,12 @@
  * Portions created by vtiger are Copyright (C) vtiger.
  * All Rights Reserved.
  ************************************************************************************/
-require_once('Smarty_setup.php');
+require_once 'Smarty_setup.php';
 
 global $mod_strings, $app_strings, $currentModule, $current_user, $theme, $log;
 
 $smarty = new vtigerCRM_Smarty();
+
 require_once 'modules/Vtiger/DetailView.php';
 if ($focus->column_fields['date_end']=='') {
 	$date = $focus->column_fields['date_start'];
@@ -27,8 +28,7 @@ if ($focus->column_fields['date_end']=='') {
 	$counter = time()-$starttime;
 	$smarty->assign('SHOW_WATCH', 'started');
 	$smarty->assign('WATCH_COUNTER', $counter);
-}
-else {
+} else {
 	$smarty->assign('SHOW_WATCH', 'halted');
 	$smarty->assign('WATCH_DISPLAY', $focus->column_fields['totaltime']);
 }
