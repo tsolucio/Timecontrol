@@ -42,27 +42,26 @@ $req->set('return_start', (isset($_REQUEST['pagenumber']) ? $_REQUEST['pagenumbe
 
 $focus = new $currentModule();
 if (!empty($_REQUEST['stop_watch'])) {
-  $focus->retrieve_entity_info($_REQUEST['record'], $currentModule);
-  foreach ($focus->column_fields as $fieldname => $val) {
-	$focus->column_fields[$fieldname] = decode_html($focus->column_fields[$fieldname]);
-  }
-  
-  $date = new DateTimeField(null);
-  $focus->column_fields['date_end'] = $date->getDisplayDate($current_user);
-  $focus->column_fields['time_end'] = $date->getDisplayTime($current_user);
+	$focus->retrieve_entity_info($_REQUEST['record'], $currentModule);
+	foreach ($focus->column_fields as $fieldname => $val) {
+		$focus->column_fields[$fieldname] = decode_html($focus->column_fields[$fieldname]);
+	}
+	$date = new DateTimeField(null);
+	$focus->column_fields['date_end'] = $date->getDisplayDate($current_user);
+	$focus->column_fields['time_end'] = $date->getDisplayTime($current_user);
 	$dt = new DateTimeField($focus->column_fields['date_end']);
 	$fmtdt = $dt->convertToDBFormat($focus->column_fields['date_end']);
 	$time_end = DateTimeField::convertToDBTimeZone($fmtdt.' '.$focus->column_fields['time_end']);
 	$te = $time_end->format('H:i:s');
 	$focus->column_fields['time_end'] = $te;
-  $focus->column_fields['description'] = decode_html($focus->column_fields['description']);
+	$focus->column_fields['description'] = decode_html($focus->column_fields['description']);
 } else {
-  setObjectValuesFromRequest($focus);
-  if ($_REQUEST['assigntype'] == 'U') {
-    $focus->column_fields['assigned_user_id'] = $_REQUEST['assigned_user_id'];
-  } elseif ($_REQUEST['assigntype'] == 'T') {
-    $focus->column_fields['assigned_user_id'] = $_REQUEST['assigned_group_id'];
-  }
+	setObjectValuesFromRequest($focus);
+	if ($_REQUEST['assigntype'] == 'U') {
+		$focus->column_fields['assigned_user_id'] = $_REQUEST['assigned_user_id'];
+	} elseif ($_REQUEST['assigntype'] == 'T') {
+		$focus->column_fields['assigned_user_id'] = $_REQUEST['assigned_group_id'];
+	}
 }
 
 $mode = (isset($_REQUEST['mode']) ? vtlib_purify($_REQUEST['mode']) : '');

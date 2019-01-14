@@ -112,15 +112,15 @@ class Timecontrol extends CRMEntity {
 	// Refers to vtiger_field.fieldname values.
 	public $mandatory_fields = array('createdtime', 'modifiedtime', 'timecontrolnr', 'date_start', 'time_start');
 
-	function standarizetimefields() {
+	public function standarizetimefields() {
 		// we format the time fields depending on the current user's timezone
-		if (!empty($this->column_fields['date_start']) and !empty($this->column_fields['time_start'])) {
+		if (!empty($this->column_fields['date_start']) && !empty($this->column_fields['time_start'])) {
 			$time_start = DateTimeField::convertToUserTimeZone($this->column_fields['date_start'].' '.DateTimeField::sanitizeTime($this->column_fields['time_start']));
 			$this->column_fields['date_start'] = $time_start->format('Y-m-d');
 			$ts = $time_start->format('H:i:s');
 			$this->column_fields['time_start'] = $ts;
 		}
-		if (!empty($this->column_fields['date_end']) and !empty($this->column_fields['time_end'])) {
+		if (!empty($this->column_fields['date_end']) && !empty($this->column_fields['time_end'])) {
 			$time_end = DateTimeField::convertToUserTimeZone($this->column_fields['date_end'].' '.DateTimeField::sanitizeTime($this->column_fields['time_end']));
 			$this->column_fields['date_end'] = $time_end->format('Y-m-d');
 			$te = $time_end->format('H:i:s');
@@ -128,11 +128,11 @@ class Timecontrol extends CRMEntity {
 		}
 	}
 
-	function preEditCheck($request, $smarty) {
+	public function preEditCheck($request, $smarty) {
 		$this->standarizetimefields();
 	}
 
-	function preViewCheck($request, $smarty) {
+	public function preViewCheck($request, $smarty) {
 		$this->standarizetimefields();
 	}
 
@@ -160,13 +160,13 @@ class Timecontrol extends CRMEntity {
 		return $value;
 	}
 
-	function preSaveCheck($request) {
+	public function preSaveCheck($request) {
 		// We set the time fields to DB format
 		$convertAll = false;
 		$convertTS = false;
 		$convertTE = false;
 		if (empty($request['stop_watch'])) {
-			if($request['action'] == 'TimecontrolAjax'){
+			if ($request['action'] == 'TimecontrolAjax') {
 				switch ($request['fldName']) {
 					case 'time_start':
 						$convertTS = true;
@@ -175,10 +175,10 @@ class Timecontrol extends CRMEntity {
 						$convertTE = true;
 						break;
 				}
-			}else{
+			} else {
 				$convertAll = true;
 			}
-			if (($convertAll || $convertTS) && (!empty($this->column_fields['date_start']) and !empty($this->column_fields['time_start']))) {
+			if (($convertAll || $convertTS) && (!empty($this->column_fields['date_start']) && !empty($this->column_fields['time_start']))) {
 				$dt = new DateTimeField($this->column_fields['date_start']);
 				$fmtdt = $dt->convertToDBFormat($this->column_fields['date_start']);
 				$time_start = DateTimeField::convertToDBTimeZone($fmtdt.' '.$this->column_fields['time_start']);
@@ -186,7 +186,7 @@ class Timecontrol extends CRMEntity {
 				$ts = $time_start->format('H:i:s');
 				$this->column_fields['time_start'] = $ts;
 			}
-			if (($convertAll || $convertTE) && (!empty($this->column_fields['date_end']) and !empty($this->column_fields['time_end']))) {
+			if (($convertAll || $convertTE) && (!empty($this->column_fields['date_end']) && !empty($this->column_fields['time_end']))) {
 				$dt = new DateTimeField($this->column_fields['date_end']);
 				$fmtdt = $dt->convertToDBFormat($this->column_fields['date_end']);
 				$time_end = DateTimeField::convertToDBTimeZone($fmtdt.' '.$this->column_fields['time_end']);
@@ -197,9 +197,9 @@ class Timecontrol extends CRMEntity {
 		}
 	}
 
-	function save_module($module) {
+	public function save_module($module) {
 		if ($this->HasDirectImageField) {
-			$this->insertIntoAttachment($this->id,$module);
+			$this->insertIntoAttachment($this->id, $module);
 		}
 		$this->updateTimesheetTotalTime();
 		$this->updateRelatedEntities($this->id);
@@ -216,62 +216,63 @@ class Timecontrol extends CRMEntity {
 	}
 
 	/** Update totaltime field */
-	function updateTimesheetTotalTime() {
-	  global $adb;
-	  if (!empty($this->column_fields['date_end']) && !empty($this->column_fields['time_end'])) {
-	    $query = "select date_start, time_start, date_end, time_end from vtiger_timecontrol where timecontrolid={$this->id}";
-	    $res = $adb->query($query);
-	    $date = $adb->query_result($res, 0, 'date_start');
-	    $time = $adb->query_result($res, 0, 'time_start');
-	    list($year, $month, $day) = explode('-', $date);
-	    list($hour, $minute) = explode(':', $time);
-	    $starttime = mktime($hour, $minute, 0, $month, $day, $year);
-	    $date = $adb->query_result($res, 0, 'date_end');
-	    $time = $adb->query_result($res, 0, 'time_end');
-	    list($year, $month, $day) = explode('-', $date);
-	    list($hour, $minute) = explode(':', $time);
-	    $endtime = mktime($hour, $minute, 0, $month, $day, $year);
-	    $counter = round(($endtime-$starttime)/60);
-	    $totaltime = str_pad(floor($counter/60), 2, '0', STR_PAD_LEFT).':'.str_pad($counter%60, 2, '0', STR_PAD_LEFT);
-	    $query = "update vtiger_timecontrol set totaltime='{$totaltime}' where timecontrolid={$this->id}";
-	    $adb->query($query);
-	    self::update_totalday_control($this->id);
-	  }
-	  if (!empty($this->column_fields['totaltime']) && (empty($this->column_fields['date_end']) && empty($this->column_fields['time_end']))) {
-	  	$totaltime = $this->column_fields['totaltime'];
-	    if (strpos($this->column_fields['totaltime'], ':')) { // tenemos formato h:m:s, lo paso a minutos
-	      $tt = explode(':', $this->column_fields['totaltime']);
-	      $ttmin = $this->column_fields['totaltime'] = $tt[0]*60+$tt[1];
-	    } elseif (strpos($totaltime, '.') !== false or strpos($totaltime, ',') !== false) { // tenemos formato decimal proporcional, lo paso a minutos
-	      $tt = preg_split( "/[.,]/", $totaltime);
-	      $mins = round(('0.'.$tt[1])*60,0);
-		  $tt0 = substr('0'.$tt[0],-2);
-		  if($tt[0] == '')
-			$tt0 = '0';
-	      $ttmin = $tt0*60+$mins;
-	      $totaltime = $tt0.':'.$mins;
-		} elseif (is_numeric($totaltime)){
-			$ttmin = $totaltime*60;
-			$totaltime = substr('0'.$totaltime,-2).':00';
-		}else{
-			$ttmin = 0;
-			$totaltime = '00:00';
+	public function updateTimesheetTotalTime() {
+		global $adb;
+		if (!empty($this->column_fields['date_end']) && !empty($this->column_fields['time_end'])) {
+			$query = "select date_start, time_start, date_end, time_end from vtiger_timecontrol where timecontrolid={$this->id}";
+			$res = $adb->query($query);
+			$date = $adb->query_result($res, 0, 'date_start');
+			$time = $adb->query_result($res, 0, 'time_start');
+			list($year, $month, $day) = explode('-', $date);
+			list($hour, $minute) = explode(':', $time);
+			$starttime = mktime($hour, $minute, 0, $month, $day, $year);
+			$date = $adb->query_result($res, 0, 'date_end');
+			$time = $adb->query_result($res, 0, 'time_end');
+			list($year, $month, $day) = explode('-', $date);
+			list($hour, $minute) = explode(':', $time);
+			$endtime = mktime($hour, $minute, 0, $month, $day, $year);
+			$counter = round(($endtime-$starttime)/60);
+			$totaltime = str_pad(floor($counter/60), 2, '0', STR_PAD_LEFT).':'.str_pad($counter%60, 2, '0', STR_PAD_LEFT);
+			$query = "update vtiger_timecontrol set totaltime='{$totaltime}' where timecontrolid={$this->id}";
+			$adb->query($query);
+			self::update_totalday_control($this->id);
 		}
-		$this->column_fields['totaltime'] = $totaltime;
-	    $query = "select date_start, time_start, date_end, time_end from vtiger_timecontrol where timecontrolid={$this->id}";
-	    $res = $adb->query($query);
-	    $date = $adb->query_result($res, 0, 'date_start');
-	    $time = $adb->query_result($res, 0, 'time_start');
-	    list($year, $month, $day) = explode('-', $date);
-	    list($hour, $minute, $seconds) = explode(':', $time);
-	    $endtime = mktime($hour, $minute+$ttmin, $seconds, $month, $day, $year);
-	    $datetimefield = new DateTimeField(date('Y-m-d', $endtime));
-	    $this->column_fields['date_end'] = $datetimefield->getDisplayDate();
-	    $this->column_fields['time_end'] = date('H:i:s', $endtime);
-	    $query = "update vtiger_timecontrol set totaltime='{$totaltime}', date_end='".date('Y-m-d', $endtime)."', time_end='{$this->column_fields['time_end']}' where timecontrolid={$this->id}";
-	    $adb->query($query);
-	    self::update_totalday_control($this->id);
-	  }
+		if (!empty($this->column_fields['totaltime']) && (empty($this->column_fields['date_end']) && empty($this->column_fields['time_end']))) {
+			$totaltime = $this->column_fields['totaltime'];
+			if (strpos($this->column_fields['totaltime'], ':')) { // tenemos formato h:m:s, lo paso a minutos
+				$tt = explode(':', $this->column_fields['totaltime']);
+				$ttmin = $this->column_fields['totaltime'] = $tt[0]*60+$tt[1];
+			} elseif (strpos($totaltime, '.') !== false or strpos($totaltime, ',') !== false) { // tenemos formato decimal proporcional, lo paso a minutos
+				$tt = preg_split( "/[.,]/", $totaltime);
+				$mins = round(('0.'.$tt[1])*60,0);
+				$tt0 = substr('0'.$tt[0],-2);
+				if ($tt[0] == '') {
+					$tt0 = '0';
+				}
+				$ttmin = $tt0*60+$mins;
+				$totaltime = $tt0.':'.$mins;
+			} elseif (is_numeric($totaltime)) {
+				$ttmin = $totaltime*60;
+				$totaltime = substr('0'.$totaltime,-2).':00';
+			} else {
+				$ttmin = 0;
+				$totaltime = '00:00';
+			}
+			$this->column_fields['totaltime'] = $totaltime;
+			$query = "select date_start, time_start, date_end, time_end from vtiger_timecontrol where timecontrolid={$this->id}";
+			$res = $adb->query($query);
+			$date = $adb->query_result($res, 0, 'date_start');
+			$time = $adb->query_result($res, 0, 'time_start');
+			list($year, $month, $day) = explode('-', $date);
+			list($hour, $minute, $seconds) = explode(':', $time);
+			$endtime = mktime($hour, $minute+$ttmin, $seconds, $month, $day, $year);
+			$datetimefield = new DateTimeField(date('Y-m-d', $endtime));
+			$this->column_fields['date_end'] = $datetimefield->getDisplayDate();
+			$this->column_fields['time_end'] = date('H:i:s', $endtime);
+			$query = "update vtiger_timecontrol set totaltime='{$totaltime}', date_end='".date('Y-m-d', $endtime)."', time_end='{$this->column_fields['time_end']}' where timecontrolid={$this->id}";
+			$adb->query($query);
+			self::update_totalday_control($this->id);
+		}
 	}
 
 	public static function update_totalday_control($tcid) {
@@ -281,36 +282,35 @@ class Timecontrol extends CRMEntity {
 					from vtiger_timecontrol
 					inner join vtiger_crmentity on crmid=timecontrolid
 					where crmid=".$tcid);
-			$workdate=$adb->query_result($tcdat,0,'date_start');
-			$user    =$adb->query_result($tcdat,0,'smownerid');
+			$workdate=$adb->query_result($tcdat, 0, 'date_start');
+			$user    =$adb->query_result($tcdat, º0, 'smownerid');
 			$tctot=$adb->query("select coalesce(sum(time_to_sec(totaltime))/3600,0) as totnum, coalesce(sec_to_time(sum(time_to_sec(totaltime))),0) as tottime
 					from vtiger_timecontrol
 					inner join vtiger_crmentity on crmid=timecontrolid
 					where date_start='$workdate' and smownerid=$user and deleted=0");
-			$totnum=$adb->query_result($tctot,0,'totnum');
-			$tottim=$adb->query_result($tctot,0,'tottime');
+			$totnum=$adb->query_result($tctot, 0, 'totnum');
+			$tottim=$adb->query_result($tctot, 0, 'tottime');
 			$adb->query("update vtiger_timecontrol
 					 inner join vtiger_crmentity on crmid=timecontrolid
 					 set totaldayhours=$totnum,totaldaytime='$tottim'
 					 where date_start='$workdate' and smownerid=$user");
 		}
-		
 	}
 
 	public static function totalday_control_installed() {
 		global $adb;
 		$cnacc=$adb->getColumnNames('vtiger_timecontrol');
-		if (in_array('totaldaytime', $cnacc)
-		and in_array('totaldayhours', $cnacc)) return true;
-		return false;
+		return (in_array('totaldaytime', $cnacc) && in_array('totaldayhours', $cnacc));
 	}
 
-	/**     Update Related Entities   */
-	function updateRelatedEntities($tcid) {
+	/** Update Related Entities */
+	public function updateRelatedEntities($tcid) {
 		global $adb;
 		$relid=$adb->getone("select relatedto from vtiger_timecontrol where timecontrolid=$tcid");
-		if (empty($relid)) return true;
-		if ($this->sumup_HelpDesk and getSalesEntityType($relid)=='HelpDesk') {
+		if (empty($relid)) {
+			return true;
+		}
+		if ($this->sumup_HelpDesk && getSalesEntityType($relid)=='HelpDesk') {
 			$query = "select sum(time_to_sec(totaltime))/3600 as stt
 			 from vtiger_timecontrol
 			 inner join vtiger_crmentity on crmid=timecontrolid
@@ -318,9 +318,9 @@ class Timecontrol extends CRMEntity {
 			$res = $adb->query($query);
 			$stt = $adb->query_result($res, 0, 'stt');
 			$query = 'update vtiger_troubletickets set hours=? where ticketid=?';
-			$adb->pquery($query,array((empty($stt) ? 0 : $stt),$relid));
+			$adb->pquery($query, array((empty($stt) ? 0 : $stt), $relid));
 		}
-		if ($this->sumup_ProjectTask and getSalesEntityType($relid)=='ProjectTask') {
+		if ($this->sumup_ProjectTask && getSalesEntityType($relid)=='ProjectTask') {
 			$query = "select sec_to_time(sum(time_to_sec(totaltime))) as stt
 			from vtiger_timecontrol
 			inner join vtiger_crmentity on crmid=timecontrolid
@@ -328,24 +328,24 @@ class Timecontrol extends CRMEntity {
 			$res = $adb->query($query);
 			$stt = $adb->query_result($res, 0, 'stt');
 			$query = 'update vtiger_projecttask set projecttaskhours=? where projecttaskid=?';
-			$adb->pquery($query,array((empty($stt) ? 0 : $stt),$relid));
+			$adb->pquery($query, array((empty($stt) ? 0 : $stt), $relid));
 		}
 	}
 
-	function trash($module,$record) {
+	public function trash($module, $record) {
 		global $adb;
-		parent::trash($module,$record);
+		parent::trash($module, $record);
 		self::update_totalday_control($record);
 		$this->updateRelatedEntities($record);
 		if (vtlib_isModuleActive('TCTotals')) {
 			include_once 'modules/TCTotals/TCTotalsHandler.php';
 			$tcdata=$adb->query("select smownerid,date_start,relatedto,product_id from vtiger_timecontrol inner join vtiger_crmentity on crmid=timecontrolid where timecontrolid=$record");
-			$workdate=$adb->query_result($tcdata,0,'date_start');
-			$tcuser=$adb->query_result($tcdata,0,'smownerid');
-			$relto=$adb->query_result($tcdata,0,'relatedto');
-			$pdoid=$adb->query_result($tcdata,0,'product_id');
+			$workdate=$adb->query_result($tcdata, 0, 'date_start');
+			$tcuser=$adb->query_result($tcdata, 0, 'smownerid');
+			$relto=$adb->query_result($tcdata, 0, 'relatedto');
+			$pdoid=$adb->query_result($tcdata, 0, 'product_id');
 			TCTotalsHandler::updateTotalTimeForUserOnDate($tcuser, $workdate);
-			TCTotalsHandler::updateTotalTimeForRelatedTo($workdate,$relto, $pdoid);
+			TCTotalsHandler::updateTotalTimeForRelatedTo($workdate, $relto, $pdoid);
 		}
 	}
 
@@ -354,7 +354,7 @@ class Timecontrol extends CRMEntity {
 	 * @param String Module name
 	 * @param String Event Type (module.postinstall, module.disabled, module.enabled, module.preuninstall)
 	 */
-	function vtlib_handler($modulename, $event_type) {
+	public function vtlib_handler($modulename, $event_type) {
 		global $adb;
 		require_once 'include/events/include.inc';
 		include_once 'vtlib/Vtiger/Module.php';
@@ -388,9 +388,9 @@ class Timecontrol extends CRMEntity {
 		}
 	}
 
-	static function addTSRelations($dorel=true) {
+	public static function addTSRelations($dorel = true) {
 		$Vtiger_Utils_Log = true;
-		include_once('vtlib/Vtiger/Module.php');
+		include_once 'vtlib/Vtiger/Module.php';
 
 		$module = Vtiger_Module::getInstance('Timecontrol');
 
@@ -400,7 +400,7 @@ class Timecontrol extends CRMEntity {
 		foreach ($cfgTCMods as $tcmod) {
 			$rtcModule = Vtiger_Module::getInstance($tcmod);
 			$rtcModule->setRelatedList($module, 'Timecontrol', array('ADD'), 'get_dependents_list');
-			$rtcModule->addLink('DETAILVIEWBASIC', 'Timecontrol', 'index.php?module=Timecontrol&action=EditView&createmode=link&return_id=$RECORD$&return_action=DetailView&return_module=$MODULE$&cbfromid=$RECORD$&relatedto=$RECORD$','modules/Timecontrol/images/stopwatch.gif');
+			$rtcModule->addLink('DETAILVIEWBASIC', 'Timecontrol', 'index.php?module=Timecontrol&action=EditView&createmode=link&return_id=$RECORD$&return_action=DetailView&return_module=$MODULE$&cbfromid=$RECORD$&relatedto=$RECORD$', 'modules/Timecontrol/images/stopwatch.gif');
 		}
 	}
 
