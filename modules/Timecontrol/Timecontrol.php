@@ -283,7 +283,7 @@ class Timecontrol extends CRMEntity {
 					inner join vtiger_crmentity on crmid=timecontrolid
 					where crmid=".$tcid);
 			$workdate=$adb->query_result($tcdat, 0, 'date_start');
-			$user    =$adb->query_result($tcdat, º0, 'smownerid');
+			$user    =$adb->query_result($tcdat, 0, 'smownerid');
 			$tctot=$adb->query("select coalesce(sum(time_to_sec(totaltime))/3600,0) as totnum, coalesce(sec_to_time(sum(time_to_sec(totaltime))),0) as tottime
 					from vtiger_timecontrol
 					inner join vtiger_crmentity on crmid=timecontrolid
