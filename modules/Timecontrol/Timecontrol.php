@@ -345,7 +345,6 @@ class Timecontrol extends CRMEntity {
 			$relto=$adb->query_result($tcdata, 0, 'relatedto');
 			$pdoid=$adb->query_result($tcdata, 0, 'product_id');
 			TCTotalsHandler::updateTotalTimeForUserOnDate($tcuser, $workdate);
-			TCTotalsHandler::updateTotalTimeForRelatedTo($workdate, $relto, $pdoid);
 		}
 	}
 
