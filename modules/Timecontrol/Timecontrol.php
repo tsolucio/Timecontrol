@@ -136,7 +136,7 @@ class Timecontrol extends CRMEntity {
 		$this->standarizetimefields();
 	}
 
-	public function formatValueForReport($dbField, $fieldType, $value, $crmid) {
+	public function formatValueForReport($dbField, $fieldType, $value, $fieldvalue, $crmid) {
 		global $adb;
 		if (!empty($crmid)) {
 			if (isset($dbField->orgname) && $dbField->orgname == 'time_end') {
