@@ -16,23 +16,26 @@
 
 class fixTimecontrolActionURL extends cbupdaterWorker {
 
-	function applyChange() {
+	public function applyChange() {
 		global $adb;
-		if ($this->hasError()) $this->sendError();
+		if ($this->hasError()) {
+			$this->sendError();
+		}
 		if ($this->isApplied()) {
 			$this->sendMsg('Changeset '.get_class($this).' already applied!');
 		} else {
 			global $adb;
-			$this->ExecuteQuery('UPDATE vtiger_links SET linkurl=? WHERE linktype=? AND linkurl=?',
+			$this->ExecuteQuery(
+				'UPDATE vtiger_links SET linkurl=? WHERE linktype=? AND linkurl=?',
 				array(
 					'index.php?module=Timecontrol&action=EditView&createmode=link&return_id=$RECORD$&return_action=DetailView&return_module=$MODULE$&cbfromid=$RECORD$&relatedto=$RECORD$',
 					'DETAILVIEWBASIC',
 					'index.php?module=Timecontrol&action=EditView&relatedto=$RECORD$'
-				));
+				)
+			);
 			$this->sendMsg('Changeset '.get_class($this).' applied!');
 			$this->markApplied();
 		}
 		$this->finishExecution();
 	}
-
 }

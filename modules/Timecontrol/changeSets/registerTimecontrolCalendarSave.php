@@ -15,10 +15,12 @@
 *************************************************************************************************/
 
 class registerTimecontrolCalendarSave extends cbupdaterWorker {
-	
-	function applyChange() {
+
+	public function applyChange() {
 		global $adb;
-		if ($this->hasError()) $this->sendError();
+		if ($this->hasError()) {
+			$this->sendError();
+		}
 		if ($this->isApplied()) {
 			$this->sendMsg('Changeset '.get_class($this).' already applied!');
 		} else {
@@ -31,9 +33,13 @@ class registerTimecontrolCalendarSave extends cbupdaterWorker {
 		$this->finishExecution();
 	}
 
-	function undoChange() {
-		if ($this->isBlocked()) return true;
-		if ($this->hasError()) $this->sendError();
+	public function undoChange() {
+		if ($this->isBlocked()) {
+			return true;
+		}
+		if ($this->hasError()) {
+			$this->sendError();
+		}
 		if ($this->isSystemUpdate()) {
 			$this->sendMsg('Changeset '.get_class($this).' is a system update, it cannot be undone!');
 		} else {
@@ -49,5 +55,4 @@ class registerTimecontrolCalendarSave extends cbupdaterWorker {
 		}
 		$this->finishExecution();
 	}
-
 }

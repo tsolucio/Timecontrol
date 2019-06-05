@@ -211,7 +211,7 @@ class Timecontrol extends CRMEntity {
 			$enum=$relm->column_fields[$seqfld['column']];
 			$ename=getEntityName($relmod, array($this->column_fields['relatedto']));
 			$ename=decode_html($ename[$this->column_fields['relatedto']]);
-			$this->db->pquery('update vtiger_timecontrol set relatednum=?, relatedname=? where timecontrolid=?',array($enum,$ename,$this->id));
+			$this->db->pquery('update vtiger_timecontrol set relatednum=?, relatedname=? where timecontrolid=?', array($enum,$ename,$this->id));
 		}
 	}
 
@@ -242,10 +242,10 @@ class Timecontrol extends CRMEntity {
 			if (strpos($this->column_fields['totaltime'], ':')) { // tenemos formato h:m:s, lo paso a minutos
 				$tt = explode(':', $this->column_fields['totaltime']);
 				$ttmin = $this->column_fields['totaltime'] = $tt[0]*60+$tt[1];
-			} elseif (strpos($totaltime, '.') !== false or strpos($totaltime, ',') !== false) { // tenemos formato decimal proporcional, lo paso a minutos
-				$tt = preg_split( "/[.,]/", $totaltime);
-				$mins = round(('0.'.$tt[1])*60,0);
-				$tt0 = substr('0'.$tt[0],-2);
+			} elseif (strpos($totaltime, '.') !== false || strpos($totaltime, ',') !== false) { // tenemos formato decimal proporcional, lo paso a minutos
+				$tt = preg_split("/[.,]/", $totaltime);
+				$mins = round(('0.'.$tt[1])*60, 0);
+				$tt0 = substr('0'.$tt[0], -2);
 				if ($tt[0] == '') {
 					$tt0 = '0';
 				}
@@ -253,7 +253,7 @@ class Timecontrol extends CRMEntity {
 				$totaltime = $tt0.':'.$mins;
 			} elseif (is_numeric($totaltime)) {
 				$ttmin = $totaltime*60;
-				$totaltime = substr('0'.$totaltime,-2).':00';
+				$totaltime = substr('0'.$totaltime, -2).':00';
 			} else {
 				$ttmin = 0;
 				$totaltime = '00:00';
@@ -269,14 +269,16 @@ class Timecontrol extends CRMEntity {
 			$datetimefield = new DateTimeField(date('Y-m-d', $endtime));
 			$this->column_fields['date_end'] = $datetimefield->getDisplayDate();
 			$this->column_fields['time_end'] = date('H:i:s', $endtime);
-			$query = "update vtiger_timecontrol set totaltime='{$totaltime}', date_end='".date('Y-m-d', $endtime)."', time_end='{$this->column_fields['time_end']}' where timecontrolid={$this->id}";
-			$adb->query($query);
+			$adb->pquery(
+				'update vtiger_timecontrol set totaltime=?, date_end=?, time_end=? where timecontrolid=?',
+				array($totaltime, date('Y-m-d', $endtime), $this->column_fields['time_end'], $this->id)
+			);
 			self::update_totalday_control($this->id);
 		}
 	}
 
 	public static function update_totalday_control($tcid) {
-		global $adb,$log;
+		global $adb;
 		if (self::totalday_control_installed()) {
 			$tcdat=$adb->query("select date_start, smownerid
 					from vtiger_timecontrol
@@ -342,8 +344,8 @@ class Timecontrol extends CRMEntity {
 			$tcdata=$adb->query("select smownerid,date_start,relatedto,product_id from vtiger_timecontrol inner join vtiger_crmentity on crmid=timecontrolid where timecontrolid=$record");
 			$workdate=$adb->query_result($tcdata, 0, 'date_start');
 			$tcuser=$adb->query_result($tcdata, 0, 'smownerid');
-			$relto=$adb->query_result($tcdata, 0, 'relatedto');
-			$pdoid=$adb->query_result($tcdata, 0, 'product_id');
+			// $relto=$adb->query_result($tcdata, 0, 'relatedto');
+			// $pdoid=$adb->query_result($tcdata, 0, 'product_id');
 			TCTotalsHandler::updateTotalTimeForUserOnDate($tcuser, $workdate);
 		}
 	}
@@ -394,12 +396,17 @@ class Timecontrol extends CRMEntity {
 		$module = Vtiger_Module::getInstance('Timecontrol');
 
 		$cfgTCMods = array('Vendors','Assets','ProjectTask','ProjectMilestone','Project','Leads','Accounts','Contacts',
-				'Campaigns','Potentials','Invoice','PurchaseOrder','SalesOrder','Quotes','HelpDesk','Services','Products',
-				'ServiceContracts');
+			'Campaigns','Potentials','Invoice','PurchaseOrder','SalesOrder','Quotes','HelpDesk','Services','Products',
+			'ServiceContracts');
 		foreach ($cfgTCMods as $tcmod) {
 			$rtcModule = Vtiger_Module::getInstance($tcmod);
 			$rtcModule->setRelatedList($module, 'Timecontrol', array('ADD'), 'get_dependents_list');
-			$rtcModule->addLink('DETAILVIEWBASIC', 'Timecontrol', 'index.php?module=Timecontrol&action=EditView&createmode=link&return_id=$RECORD$&return_action=DetailView&return_module=$MODULE$&cbfromid=$RECORD$&relatedto=$RECORD$', 'modules/Timecontrol/images/stopwatch.gif');
+			$rtcModule->addLink(
+				'DETAILVIEWBASIC',
+				'Timecontrol',
+				'index.php?module=Timecontrol&action=EditView&createmode=link&return_id=$RECORD$&return_action=DetailView&return_module=$MODULE$&cbfromid=$RECORD$&relatedto=$RECORD$',
+				'modules/Timecontrol/images/stopwatch.gif'
+			);
 		}
 	}
 

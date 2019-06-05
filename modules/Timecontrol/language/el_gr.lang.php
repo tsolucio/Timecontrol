@@ -9,15 +9,15 @@
  * All Rights Reserved.
  ************************************************************************************/
 
-$mod_strings = Array(
+$mod_strings = array(
 	'Timecontrol' => 'Χρονοδιαγράμματα',
 
 	'LBL_CUSTOM_INFORMATION' => 'Ειδικές Πληροφορίες',
 	'LBL_TIMECONTROL_INFORMATION' => 'Πληροφορίες Χρονοδιαγράμματος',
 	'LBL_DESCRIPTION_INFORMATION' => 'Πληροφορίες Περιγραφής',
-	
+
 	'SINGLE_Timecontrol'=>'Χρονοδιάγραμμα',
-	
+
 	'LBL_WATCH_STOP'=>'Παύση',
 	'LBL_WATCH_RESTART'=>'Συνέχεια',
 
@@ -32,9 +32,8 @@ $mod_strings = Array(
 	'Related To' => "Σχετίζεται με",
 	'Product Name' => "Προϊόν/Υπηρεσία",
 	'Units' => 'Μονάδες',
-	
+
 	'relatednum' => 'Related Num',
 	'relatedname' => 'Related Name',
 );
-
 ?>

@@ -41,4 +41,4 @@ function ParseAjaxResponse(somemixedcode) {
 		}
 	}
 	return source;
-} 
+}

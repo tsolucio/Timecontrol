@@ -17,7 +17,7 @@ if (!empty($_REQUEST['calendarrecord'])) { // coming from Calendar
 	$c4y->id = vtlib_purify($c4yrecord);
 	$activity_mode = vtlib_purify($_REQUEST['activity_mode']);
 	$c4y->retrieve_entity_info($c4yrecord, ($activity_mode == 'Task' ? 'Calendar' : 'Events'));
-	$_REQUEST['title'] = getTranslatedString($c4y->column_fields['activitytype'],'Calendar').' :: '.$c4y->column_fields['subject'];
+	$_REQUEST['title'] = getTranslatedString($c4y->column_fields['activitytype'], 'Calendar').' :: '.$c4y->column_fields['subject'];
 	$_REQUEST['date_start'] = $c4y->column_fields['date_start'];
 	$_REQUEST['time_start'] = $c4y->column_fields['time_start'];
 	$_REQUEST['date_end'] = $c4y->column_fields['due_date'];
@@ -45,18 +45,18 @@ if (!empty($_REQUEST['calendarrecord'])) { // coming from Calendar
 } elseif (empty($record)) { // creating
 	$cbnow=new DateTimeField(null);
 	$_REQUEST['time_start'] = $cbnow->getDisplayTime($current_user);
-	$rshd=$adb->pquery('select tcproduct from vtiger_users where id=?',array($current_user->id));
+	$rshd=$adb->pquery('select tcproduct from vtiger_users where id=?', array($current_user->id));
 	if ($rshd) {
-		$tcpdo = $adb->query_result($rshd,0,'tcproduct');
+		$tcpdo = $adb->query_result($rshd, 0, 'tcproduct');
 		if (!empty($tcpdo)) {
 			$_REQUEST['product_id']=$tcpdo;
 		}
 	}
 }
 
-$rsusrpdo=$adb->pquery('select tcproduct from vtiger_users where id=?',array($current_user->id));
+$rsusrpdo=$adb->pquery('select tcproduct from vtiger_users where id=?', array($current_user->id));
 if ($rsusrpdo) {
-	$tcpdo = $adb->query_result($rsusrpdo,0,'tcproduct');
+	$tcpdo = $adb->query_result($rsusrpdo, 0, 'tcproduct');
 	if (!empty($tcpdo)) {
 		$_REQUEST['product_id']=$tcpdo;
 	}
@@ -64,12 +64,12 @@ if ($rsusrpdo) {
 
 // Contribution made by Ted Janzen of Janzen & Janzen ICT Services http://www.j2ict.nl
 $relto = (!empty($_REQUEST['relatedto']) ? vtlib_purify($_REQUEST['relatedto']) : '');
-if (!empty($relto) and getSalesEntityType($relto)=='HelpDesk') { // coming from TT, pickup data
-	$rshd=$adb->pquery('select ticket_no,product_id from vtiger_troubletickets where ticketid=?',array($relto));
+if (!empty($relto) && getSalesEntityType($relto)=='HelpDesk') { // coming from TT, pickup data
+	$rshd=$adb->pquery('select ticket_no,product_id from vtiger_troubletickets where ticketid=?', array($relto));
 	if (empty($_REQUEST['product_id'])) {
-		$_REQUEST['product_id']=$adb->query_result($rshd,0,'product_id');
+		$_REQUEST['product_id']=$adb->query_result($rshd, 0, 'product_id');
 	}
-	$_REQUEST['title']=$adb->query_result($rshd,0,'ticket_no');
+	$_REQUEST['title']=$adb->query_result($rshd, 0, 'ticket_no');
 }
 
 require_once 'modules/Vtiger/EditView.php';

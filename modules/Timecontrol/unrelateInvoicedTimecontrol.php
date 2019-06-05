@@ -16,14 +16,13 @@
 *************************************************************************************************/
 
 function unrelateInvoicedTimecontrol($entity) {
-    global $adb,$default_charset,$log;
+	global $adb;
 
-    list($inv,$inv_id) = explode('x',$entity->data['id']);
-    if (getSalesEntityType($inv_id)=='Invoice') {
-    	$adb->query("update vtiger_timecontrol set invoiced=0 where timecontrolid in
-    		(select crmid from vtiger_crmentityrel where module='Timecontrol' and relmodule='Invoice' and relcrmid=$inv_id)");
-    	$adb->query("delete from vtiger_crmentityrel where module='Timecontrol' and relmodule='Invoice' and relcrmid=$inv_id");
-    }
+	list($void, $inv_id) = explode('x', $entity->data['id']);
+	if (getSalesEntityType($inv_id)=='Invoice') {
+		$adb->query("update vtiger_timecontrol set invoiced=0 where timecontrolid in
+			(select crmid from vtiger_crmentityrel where module='Timecontrol' and relmodule='Invoice' and relcrmid=$inv_id)");
+		$adb->query("delete from vtiger_crmentityrel where module='Timecontrol' and relmodule='Invoice' and relcrmid=$inv_id");
+	}
 }
-
 ?>

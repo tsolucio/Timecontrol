@@ -18,7 +18,6 @@
  *  Author       : JPL TSolucio, S. L.
  *************************************************************************************************/
 class TCCalendarHandler extends VTEventHandler {
-	private $_moduleCache = array();
 
 	/**
 	 * @param $handlerType
@@ -28,8 +27,8 @@ class TCCalendarHandler extends VTEventHandler {
 	}
 
 	public function handleFilter($handlerType, $parameter) {
-		global $currentModule,$adb,$log,$current_user;
-		if (isset($parameter[0]['record']) and !empty($parameter[0]['record'])) {
+		global $current_user;
+		if (isset($parameter[0]['record']) && !empty($parameter[0]['record'])) {
 			$setype = getSalesEntityType($parameter[0]['record']);
 			if ($setype == 'Timecontrol') {
 				if ($handlerType=='corebos.filter.CalendarModule.save') {
@@ -37,7 +36,7 @@ class TCCalendarHandler extends VTEventHandler {
 						require_once 'modules/Timecontrol/Timecontrol.php';
 						$focus = new Timecontrol();
 						$focus->retrieve_entity_info($parameter[0]['record'], 'Timecontrol');
-						foreach($focus->column_fields as $fieldname => $val) {
+						foreach ($focus->column_fields as $fieldname => $val) {
 							$focus->column_fields[$fieldname] = decode_html($focus->column_fields[$fieldname]);
 						}
 						$focus->column_fields['description'] = decode_html($focus->column_fields['description']);
@@ -47,15 +46,15 @@ class TCCalendarHandler extends VTEventHandler {
 						}
 						list($y,$m,$d) = explode('-', $focus->column_fields['date_end']);
 						list($h,$i,$s) = explode(':', $focus->column_fields['time_end']);
-						$t = mktime($h,$i+$parameter[0]['minute'],$s,$m,$d+$parameter[0]['day'],$y);
-						$date = new DateTimeField(date("Y-m-d H:i:s",$t));
+						$t = mktime($h, $i+$parameter[0]['minute'], $s, $m, $d+$parameter[0]['day'], $y);
+						$date = new DateTimeField(date('Y-m-d H:i:s', $t));
 						$focus->column_fields['date_end'] = $date->getDisplayDate($current_user);
 						$focus->column_fields['time_end'] = $date->getDisplayTime($current_user);
 						if ($parameter[0]['mode'] == 'event_drop') {
 							list($y,$m,$d) = explode('-', $focus->column_fields['date_start']);
 							list($h,$i,$s) = explode(':', $focus->column_fields['time_start']);
-							$t = mktime($h,$i+$parameter[0]['minute'],$s,$m,$d+$parameter[0]['day'],$y);
-							$date = new DateTimeField(date("Y-m-d H:i:s",$t));
+							$t = mktime($h, $i+$parameter[0]['minute'], $s, $m, $d+$parameter[0]['day'], $y);
+							$date = new DateTimeField(date('Y-m-d H:i:s', $t));
 							$focus->column_fields['date_start'] = $date->getDisplayDate($current_user);
 							$focus->column_fields['time_start'] = $date->getDisplayTime($current_user);
 						}

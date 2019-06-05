@@ -1,12 +1,12 @@
 <?php
-/***********************************************************************************
+/*+**********************************************************************************
  * The contents of this file are subject to the vtiger CRM Public License Version 1.0
  * ("License"); You may not use this file except in compliance with the License
  * Portions created by vtiger are Copyright (C) vtiger.
  * All Rights Reserved.
  ************************************************************************************/
 
-$mod_strings = Array(
+$mod_strings = array(
 	'Timecontrol' => 'Control TiempoMaterial',
 	'SINGLE_Timecontrol' => 'Control TiempoMaterial',
 	'Timecontrol ID' => 'ID Control TiempoMaterial',
@@ -14,9 +14,8 @@ $mod_strings = Array(
 	'LBL_CUSTOM_INFORMATION' => 'Información Personalizada',
 	'LBL_TIMECONTROL_INFORMATION' => 'Información TiempoMaterial',
 	'LBL_DESCRIPTION_INFORMATION' => 'Descripción',
-	
+
 	'SINGLE_Timecontrol'=>'Control TiempoMaterial',
-	
 	'LBL_WATCH_STOP'=>'Detener',
 	'LBL_WATCH_RESTART'=>'Iniciar',
 
@@ -34,9 +33,8 @@ $mod_strings = Array(
 	'Stopwatch'=>'Cronómetro',
 	'TotalDayTime'=>'Total Tiempo Día',
 	'TotalDayHours'=>'Total Horas Día',
-	
+
 	'relatednum' => 'Núm. relacionado',
 	'relatedname' => 'Nombre relacionado',
 );
-
 ?>

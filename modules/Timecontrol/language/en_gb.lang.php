@@ -8,7 +8,7 @@
  * All Rights Reserved.
  ************************************************************************************/
 
-$mod_strings = Array(
+$mod_strings = array(
 	'Timecontrol' => 'Timecontrol',
 	'SINGLE_Timecontrol' => 'Timecontrol',
 	'Timecontrol ID' => 'Timecontrol ID',
@@ -16,9 +16,9 @@ $mod_strings = Array(
 	'LBL_CUSTOM_INFORMATION' => 'Custom Information',
 	'LBL_TIMECONTROL_INFORMATION' => 'Timecontrol Information',
 	'LBL_DESCRIPTION_INFORMATION' => 'Description Information',
-	
+
 	'SINGLE_Timecontrol'=>'Timecontrol',
-	
+
 	'LBL_WATCH_STOP'=>'Stop',
 	'LBL_WATCH_RESTART'=>'Resume',
 
@@ -36,10 +36,8 @@ $mod_strings = Array(
 	'Stopwatch'=>'Stopwatch',
 	'TotalDayTime'=>'Total Day Time',
 	'TotalDayHours'=>'Total Day Hours',
-	
+
 	'relatednum' => 'Related Num',
 	'relatedname' => 'Related Name',
-	
 );
-
 ?>

@@ -8,15 +8,14 @@
  * All Rights Reserved.
  ************************************************************************************/
 
-$mod_strings = Array(
+$mod_strings = array(
 	'Timecontrol' => 'Таймер',
 
 	'LBL_CUSTOM_INFORMATION' => 'Дополнительная информация',
 	'LBL_TIMECONTROL_INFORMATION' => 'Информация о таймере',
 	'LBL_DESCRIPTION_INFORMATION' => 'Описание',
-	
+
 	'SINGLE_Timecontrol'=>'Таймер',
-	
 	'LBL_WATCH_STOP'=>'Стоп',
 	'LBL_WATCH_RESTART'=>'Возобновить',
 
@@ -33,9 +32,8 @@ $mod_strings = Array(
 	'Units' => 'Единиц',
 	'Invoiced' => 'Счет выставлен',
 	'Invoiced on' => 'Выставленные счета',
-	
+
 	'relatednum' => 'Related Num',
 	'relatedname' => 'Related Name',
 );
-
 ?>
