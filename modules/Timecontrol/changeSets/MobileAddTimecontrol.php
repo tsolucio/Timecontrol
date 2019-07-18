@@ -33,12 +33,17 @@ class MobileAddTimecontrol extends cbupdaterWorker {
 				if (!vtlib_isModuleActive($modulename)) {
 					$crmtogo_active = 0;
 				}
-				$res_seq = $adb->pquery('SELECT MAX(order_num) as seq FROM berli_crmtogo_modules WHERE crmtogo_user=?', array(Users::getActiveAdminId()));
-				$seq = $adb->query_result($res_seq, 0, 'seq') + 1;
-				$this->ExecuteQuery(
-					'INSERT INTO `berli_crmtogo_modules` (`crmtogo_user`, `crmtogo_module`, `crmtogo_active`, `order_num`) VALUES (?, ?, ?, ?)',
-					array(Users::getActiveAdminId(), $modulename, $crmtogo_active, $seq)
-				);
+				$result = $adb->pquery("SELECT id FROM vtiger_users",array());
+				while($row = $adb->fetch_array($result)) {
+					$res_seq = $adb->pquery('SELECT MAX(order_num) as seq FROM berli_crmtogo_modules WHERE crmtogo_user=?', array($row['id']));
+					$seq = $adb->query_result($res_seq, 0, 'seq') + 1;
+					if ($seq > 1) {
+						$this->ExecuteQuery(
+							'INSERT INTO `berli_crmtogo_modules` (`crmtogo_user`, `crmtogo_module`, `crmtogo_active`, `order_num`) VALUES (?, ?, ?, ?)',
+							array($row['id'], $modulename, $crmtogo_active, $seq)
+						);
+					}
+				}
 			}
 			$this->sendMsg('Changeset '.get_class($this).' applied!');
 			$this->markApplied(false);
