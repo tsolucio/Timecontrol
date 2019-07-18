@@ -24,6 +24,7 @@ class Timecontrol extends CRMEntity {
 	public $table_name = 'vtiger_timecontrol';
 	public $table_index= 'timecontrolid';
 	public $column_fields = array();
+	public $moduleIcon = array('library' => 'utility', 'containerClass' => 'slds-icon_container slds-icon-standard-user', 'class' => 'slds-icon', 'icon'=>'clock');
 
 	/** Indicator if this is a custom module or standard module */
 	public $IsCustomModule = true;
