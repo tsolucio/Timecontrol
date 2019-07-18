@@ -28,15 +28,15 @@ class MobileAddTimecontrol extends cbupdaterWorker {
 			$result = $adb->pquery("SELECT crmtogo_module FROM berli_crmtogo_modules WHERE crmtogo_module = 'Timecontrol'", array());
 
 			if ($adb->num_rows($result) == 0) {
-				$modulename="Timecontrol";
+				$modulename='Timecontrol';
 				$crmtogo_active = 1;
 				if (!vtlib_isModuleActive($modulename)) {
 					$crmtogo_active = 0;
 				}
-				$result = $adb->pquery("SELECT id FROM vtiger_users",array());
-				while($row = $adb->fetch_array($result)) {
-					$res_seq = $adb->pquery('SELECT MAX(order_num) as seq FROM berli_crmtogo_modules WHERE crmtogo_user=?', array($row['id']));
-					$seq = $adb->query_result($res_seq, 0, 'seq') + 1;
+				$result = $adb->pquery('SELECT id FROM vtiger_users', array());
+				while ($row = $adb->fetch_array($result)) {
+					$res_seq = $adb->pquery('SELECT coalesce(MAX(order_num), 0) as seq FROM berli_crmtogo_modules WHERE crmtogo_user=?', array($row['id']));
+					$seq = (int)$adb->query_result($res_seq, 0, 'seq') + 1;
 					if ($seq > 1) {
 						$this->ExecuteQuery(
 							'INSERT INTO `berli_crmtogo_modules` (`crmtogo_user`, `crmtogo_module`, `crmtogo_active`, `order_num`) VALUES (?, ?, ?, ?)',
