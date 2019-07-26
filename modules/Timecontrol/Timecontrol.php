@@ -306,6 +306,18 @@ class Timecontrol extends CRMEntity {
 		return (in_array('totaldaytime', $cnacc) && in_array('totaldayhours', $cnacc));
 	}
 
+	public static function userTotalTime($date, $usrid) {
+		global $adb;
+		$rs=$adb->pquery(
+			'select coalesce(totaldayhours, 0) as totday
+				from vtiger_timecontrol
+				inner join vtiger_crmentity on crmid=timecontrolid
+				where deleted=0 and date_start=? and smownerid=?',
+			array($date, $usrid)
+		);
+		return (int)($rs->fields['totday'] * 60);
+	}
+
 	/** Update Related Entities */
 	public function updateRelatedEntities($tcid) {
 		global $adb;
