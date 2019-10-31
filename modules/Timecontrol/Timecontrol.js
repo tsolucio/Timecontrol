@@ -18,8 +18,8 @@ function updateClock(force) {
 		}
 		var clock_display_hours = document.getElementById('clock_display_hours');
 		var clock_display_minutes = document.getElementById('clock_display_minutes');
-		clock_display_hours.replaceChild(document.createTextNode(hours),clock_display_hours.firstChild);
-		clock_display_minutes.replaceChild(document.createTextNode(minutes),clock_display_minutes.firstChild);
+		clock_display_hours.replaceChild(document.createTextNode(hours), clock_display_hours.firstChild);
+		clock_display_minutes.replaceChild(document.createTextNode(minutes), clock_display_minutes.firstChild);
 	}
 }
 
