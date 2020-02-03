@@ -322,7 +322,10 @@ class Timecontrol extends CRMEntity {
 				where deleted=0 and date_start=? and smownerid=?',
 			array($date, $usrid)
 		);
-		return (int)($rs->fields['totday'] * 60);
+		if ($rs && $adb->num_rows($rs)==1) {
+			return (int)($rs->fields['totday'] * 60);
+		}
+		return 0;
 	}
 
 	/** Update Related Entities */
