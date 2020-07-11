@@ -177,10 +177,10 @@ class Timecontrol extends CRMEntity {
 						break;
 				}
 			} elseif (isset($request['massedit_module']) && $request['massedit_module'] == 'Timecontrol') {
-				if ($request['time_start_mass_edit_check']) {
+				if (isset($request['time_start_mass_edit_check']) && $request['time_start_mass_edit_check']) {
 					$convertTS = true;
 				}
-				if ($request['time_end_mass_edit_check']) {
+				if (isset($request['time_end_mass_edit_check']) && $request['time_end_mass_edit_check']) {
 					$convertTE = true;
 				}
 			} else {
