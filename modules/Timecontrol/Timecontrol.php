@@ -300,6 +300,8 @@ class Timecontrol extends CRMEntity {
 					where date_start='$workdate' and smownerid=$user and deleted=0");
 			$totnum=$adb->query_result($tctot, 0, 'totnum');
 			$tottim=$adb->query_result($tctot, 0, 'tottime');
+			$tottim=explode('.', $tottim); // eliminate microseconds if they are there
+			$tottim=$tottim[0];
 			$adb->query("update vtiger_timecontrol
 					 inner join vtiger_crmentity on crmid=timecontrolid
 					 set totaldayhours=$totnum,totaldaytime='$tottim'
