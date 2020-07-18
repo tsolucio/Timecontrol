@@ -46,12 +46,13 @@ class Timecontrol extends CRMEntity {
 	public $tab_name_index = array(
 		'vtiger_crmentity' => 'crmid',
 		'vtiger_timecontrol'   => 'timecontrolid',
-		'vtiger_timecontrolcf' => 'timecontrolid');
+		'vtiger_timecontrolcf' => 'timecontrolid',
+	);
 
 	/**
 	 * Mandatory for Listing (Related listview)
 	 */
-	public $list_fields = array (
+	public $list_fields = array(
 		/* Format: Field Label => array(tablename => columnname) */
 		// tablename should not have prefix 'vtiger_'
 		'Timecontrol Number' => array('timecontrol' => 'timecontrolnr'),
@@ -386,7 +387,7 @@ class Timecontrol extends CRMEntity {
 		include_once 'vtlib/Vtiger/Module.php';
 		$em = new VTEventsManager($adb);
 		if ($event_type == 'module.postinstall') {
-			// TODO Handle post installation actions
+			// Handle post installation actions
 			$this->setModuleSeqNumber('configure', $modulename, 'TIME-BILLING-', '000001');
 			$em->registerHandler('corebos.filter.CalendarModule.save', 'modules/Timecontrol/TCCalendarHandler.php', 'TCCalendarHandler');
 			$em->registerHandler('corebos.filter.listview.render', 'modules/Timecontrol/convertTZListView.php', 'convertTZListViewOnTimecontrol');
@@ -407,15 +408,15 @@ class Timecontrol extends CRMEntity {
 				}
 			}
 		} elseif ($event_type == 'module.disabled') {
-			// TODO Handle actions when this module is disabled.
+			// Handle actions when this module is disabled.
 		} elseif ($event_type == 'module.enabled') {
-			// TODO Handle actions when this module is enabled.
+			// Handle actions when this module is enabled.
 		} elseif ($event_type == 'module.preuninstall') {
-			// TODO Handle actions when this module is about to be deleted.
+			// Handle actions when this module is about to be deleted.
 		} elseif ($event_type == 'module.preupdate') {
-			// TODO Handle actions before this module is updated.
+			// Handle actions before this module is updated.
 		} elseif ($event_type == 'module.postupdate') {
-			// TODO Handle actions after this module is updated.
+			// Handle actions after this module is updated.
 			$adb->query("update vtiger_field SET typeofdata='D~M', uitype=5 WHERE tablename='vtiger_timecontrol' and columnname='date_start'");
 			$adb->query("update vtiger_field SET typeofdata='D~O', uitype=5 WHERE tablename='vtiger_timecontrol' and columnname='date_end'");
 			$adb->query("update vtiger_field SET displaytype=1, uitype=14 WHERE tablename='vtiger_timecontrol' and columnname='time_start'");
