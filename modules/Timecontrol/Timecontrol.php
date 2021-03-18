@@ -287,24 +287,31 @@ class Timecontrol extends CRMEntity {
 	public static function update_totalday_control($tcid) {
 		global $adb;
 		if (self::totalday_control_installed()) {
-			$tcdat=$adb->query("select date_start, smownerid
-					from vtiger_timecontrol
-					inner join vtiger_crmentity on crmid=timecontrolid
-					where crmid=".$tcid);
+			$crmEntityTable = CRMEntity::getcrmEntityTableAlias('Timecontrol');
+			$tcdat=$adb->pquery(
+				'select date_start, vtiger_crmentity.smownerid from vtiger_timecontrol inner join '.$crmEntityTable
+					.' on vtiger_crmentity.crmid=timecontrolid where timecontrolid=?',
+				array($tcid)
+			);
 			$workdate=$adb->query_result($tcdat, 0, 'date_start');
 			$user    =$adb->query_result($tcdat, 0, 'smownerid');
-			$tctot=$adb->query("select coalesce(sum(time_to_sec(totaltime))/3600,0) as totnum, coalesce(sec_to_time(sum(time_to_sec(totaltime))),0) as tottime
-					from vtiger_timecontrol
-					inner join vtiger_crmentity on crmid=timecontrolid
-					where date_start='$workdate' and smownerid=$user and deleted=0");
+			$tctot=$adb->pquery(
+				'select coalesce(sum(time_to_sec(totaltime))/3600,0) as totnum, coalesce(sec_to_time(sum(time_to_sec(totaltime))),0) as tottime
+				from vtiger_timecontrol
+				inner join '.$crmEntityTable.' on vtiger_crmentity.crmid=timecontrolid
+				where date_start=? and vtiger_crmentity.smownerid=? and vtiger_crmentity.deleted=0',
+				array($workdate, $user)
+			);
 			$totnum=$adb->query_result($tctot, 0, 'totnum');
 			$tottim=$adb->query_result($tctot, 0, 'tottime');
 			$tottim=explode('.', $tottim); // eliminate microseconds if they are there
 			$tottim=$tottim[0];
-			$adb->query("update vtiger_timecontrol
-					 inner join vtiger_crmentity on crmid=timecontrolid
-					 set totaldayhours=$totnum,totaldaytime='$tottim'
-					 where date_start='$workdate' and smownerid=$user");
+			$adb->pquery(
+				'update vtiger_timecontrol inner join '.$crmEntityTable.' on vtiger_crmentity.crmid=timecontrolid
+				set totaldayhours=?, totaldaytime=?
+				where date_start=? and vtiger_crmentity.smownerid=?',
+				array($totnum, $tottim, $workdate, $user)
+			);
 		}
 	}
 
@@ -316,11 +323,12 @@ class Timecontrol extends CRMEntity {
 
 	public static function userTotalTime($date, $usrid) {
 		global $adb;
+		$crmEntityTable = CRMEntity::getcrmEntityTableAlias('Timecontrol');
 		$rs=$adb->pquery(
 			'select coalesce(totaldayhours, 0) as totday
-				from vtiger_timecontrol
-				inner join vtiger_crmentity on crmid=timecontrolid
-				where deleted=0 and date_start=? and smownerid=?',
+			from vtiger_timecontrol
+			inner join '.$crmEntityTable.' on vtiger_crmentity.crmid=timecontrolid
+			where vtiger_crmentity.deleted=0 and date_start=? and vtiger_crmentity.smownerid=?',
 			array($date, $usrid)
 		);
 		if ($rs && $adb->num_rows($rs)==1) {
@@ -336,25 +344,28 @@ class Timecontrol extends CRMEntity {
 		if (empty($relid)) {
 			return true;
 		}
+		$crmEntityTable = CRMEntity::getcrmEntityTableAlias('Timecontrol');
 		if ($this->sumup_HelpDesk && getSalesEntityType($relid)=='HelpDesk') {
-			$query = "select sum(time_to_sec(totaltime))/3600 as stt
-			 from vtiger_timecontrol
-			 inner join vtiger_crmentity on crmid=timecontrolid
-			 where relatedto=$relid and deleted=0";
-			$res = $adb->query($query);
+			$res = $adb->pquery(
+				'select sum(time_to_sec(totaltime))/3600 as stt
+				from vtiger_timecontrol
+				inner join '.$crmEntityTable.' on vtiger_crmentity.crmid=timecontrolid
+				where relatedto=? and vtiger_crmentity.deleted=0',
+				array($relid)
+			);
 			$stt = $adb->query_result($res, 0, 'stt');
-			$query = 'update vtiger_troubletickets set hours=? where ticketid=?';
-			$adb->pquery($query, array((empty($stt) ? 0 : $stt), $relid));
+			$adb->pquery('update vtiger_troubletickets set hours=? where ticketid=?', array((empty($stt) ? 0 : $stt), $relid));
 		}
 		if ($this->sumup_ProjectTask && getSalesEntityType($relid)=='ProjectTask') {
-			$query = "select sec_to_time(sum(time_to_sec(totaltime))) as stt
-			from vtiger_timecontrol
-			inner join vtiger_crmentity on crmid=timecontrolid
-			where relatedto=$relid and deleted=0";
-			$res = $adb->query($query);
+			$res = $adb->pquery(
+				'select sec_to_time(sum(time_to_sec(totaltime))) as stt
+				from vtiger_timecontrol
+				inner join '.$crmEntityTable.' on vtiger_crmentity.crmid=timecontrolid
+				where relatedto=? and vtiger_crmentity.deleted=0',
+				array($relid)
+			);
 			$stt = $adb->query_result($res, 0, 'stt');
-			$query = 'update vtiger_projecttask set projecttaskhours=? where projecttaskid=?';
-			$adb->pquery($query, array((empty($stt) ? 0 : $stt), $relid));
+			$adb->pquery('update vtiger_projecttask set projecttaskhours=? where projecttaskid=?', array((empty($stt) ? 0 : $stt), $relid));
 		}
 	}
 
@@ -364,8 +375,13 @@ class Timecontrol extends CRMEntity {
 		self::update_totalday_control($record);
 		$this->updateRelatedEntities($record);
 		if (vtlib_isModuleActive('TCTotals')) {
+			$crmEntityTable = CRMEntity::getcrmEntityTableAlias('Timecontrol');
 			include_once 'modules/TCTotals/TCTotalsHandler.php';
-			$tcdata=$adb->query("select smownerid,date_start,relatedto,product_id from vtiger_timecontrol inner join vtiger_crmentity on crmid=timecontrolid where timecontrolid=$record");
+			$tcdata=$adb->pquery(
+				'select vtiger_crmentity.smownerid,date_start,relatedto,product_id from vtiger_timecontrol inner join '.$crmEntityTable
+				.' on vtiger_crmentity.crmid=timecontrolid where timecontrolid=?',
+				array($record)
+			);
 			$workdate=$adb->query_result($tcdata, 0, 'date_start');
 			$tcuser=$adb->query_result($tcdata, 0, 'smownerid');
 			// $relto=$adb->query_result($tcdata, 0, 'relatedto');

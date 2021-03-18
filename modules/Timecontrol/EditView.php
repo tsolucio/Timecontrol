@@ -11,13 +11,12 @@ include_once 'modules/Timecontrol/Timecontrol.php';
 $record = (isset($_REQUEST['record']) ? vtlib_purify($_REQUEST['record']) : 0);
 $isduplicate = (isset($_REQUEST['isDuplicate']) ? vtlib_purify($_REQUEST['isDuplicate']) : '');
 if (!empty($_REQUEST['calendarrecord'])) { // coming from Calendar
-	require_once 'modules/Calendar/Calendar.php';
-	$c4y = CRMEntity::getInstance('Calendar');
+	$c4y = CRMEntity::getInstance('cbCalendar');
 	$c4yrecord = vtlib_purify($_REQUEST['calendarrecord']);
 	$c4y->id = vtlib_purify($c4yrecord);
 	$activity_mode = vtlib_purify($_REQUEST['activity_mode']);
-	$c4y->retrieve_entity_info($c4yrecord, ($activity_mode == 'Task' ? 'Calendar' : 'Events'));
-	$_REQUEST['title'] = getTranslatedString($c4y->column_fields['activitytype'], 'Calendar').' :: '.$c4y->column_fields['subject'];
+	$c4y->retrieve_entity_info($c4yrecord, 'cbCalendar');
+	$_REQUEST['title'] = getTranslatedString($c4y->column_fields['activitytype'], 'cbCalendar').' :: '.$c4y->column_fields['subject'];
 	$_REQUEST['date_start'] = $c4y->column_fields['date_start'];
 	$_REQUEST['time_start'] = $c4y->column_fields['time_start'];
 	$_REQUEST['date_end'] = $c4y->column_fields['due_date'];
