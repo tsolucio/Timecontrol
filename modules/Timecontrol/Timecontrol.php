@@ -11,9 +11,6 @@ require_once 'data/CRMEntity.php';
 require_once 'data/Tracker.php';
 
 class Timecontrol extends CRMEntity {
-	public $db;
-	public $log;
-
 	// Variable to esablish start value on resume
 	// true: dates and start time will be set to "now"
 	// false: only start time will be set to "now"
@@ -207,6 +204,7 @@ class Timecontrol extends CRMEntity {
 	}
 
 	public function save_module($module) {
+		global $adb;
 		if ($this->HasDirectImageField) {
 			$this->insertIntoAttachment($this->id, $module);
 		}
@@ -220,7 +218,7 @@ class Timecontrol extends CRMEntity {
 			$enum=$relm->column_fields[$seqfld['column']];
 			$ename=getEntityName($relmod, array($this->column_fields['relatedto']));
 			$ename=decode_html($ename[$this->column_fields['relatedto']]);
-			$this->db->pquery('update vtiger_timecontrol set relatednum=?, relatedname=? where timecontrolid=?', array($enum,$ename,$this->id));
+			$adb->pquery('update vtiger_timecontrol set relatednum=?, relatedname=? where timecontrolid=?', array($enum,$ename,$this->id));
 		}
 	}
 
