@@ -340,10 +340,11 @@ class Timecontrol extends CRMEntity {
 	/** Update Related Entities */
 	public function updateRelatedEntities($tcid) {
 		global $adb;
-		$relid=$adb->getone("select relatedto from vtiger_timecontrol where timecontrolid=$tcid");
-		if (empty($relid)) {
+		$rs=$adb->query("select relatedto from vtiger_timecontrol where timecontrolid=$tcid");
+		if (!$rs || $adb->num_rows($rs)==0) {
 			return true;
 		}
+		$relid = $adb->query_result($rs, 0, 'relatedto');
 		$crmEntityTable = CRMEntity::getcrmEntityTableAlias('Timecontrol');
 		if ($this->sumup_HelpDesk && getSalesEntityType($relid)=='HelpDesk') {
 			$res = $adb->pquery(
