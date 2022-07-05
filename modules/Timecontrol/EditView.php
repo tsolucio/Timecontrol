@@ -44,20 +44,15 @@ if (!empty($_REQUEST['calendarrecord'])) { // coming from Calendar
 } elseif (empty($record)) { // creating
 	$cbnow=new DateTimeField(null);
 	$_REQUEST['time_start'] = $cbnow->getDisplayTime($current_user);
-	$rshd=$adb->pquery('select tcproduct from vtiger_users where id=?', array($current_user->id));
-	if ($rshd) {
-		$tcpdo = $adb->query_result($rshd, 0, 'tcproduct');
-		if (!empty($tcpdo)) {
-			$_REQUEST['product_id']=$tcpdo;
+	$cnusr = $adb->getColumnNames('vtiger_users');
+	if (in_array('tcproduct', $cnusr)) {
+		$rshd=$adb->pquery('select tcproduct from vtiger_users where id=?', array($current_user->id));
+		if ($rshd && $adb->num_rows($rshd)>0) {
+			$tcpdo = $adb->query_result($rshd, 0, 'tcproduct');
+			if (!empty($tcpdo)) {
+				$_REQUEST['product_id']=$tcpdo;
+			}
 		}
-	}
-}
-
-$rsusrpdo=$adb->pquery('select tcproduct from vtiger_users where id=?', array($current_user->id));
-if ($rsusrpdo) {
-	$tcpdo = $adb->query_result($rsusrpdo, 0, 'tcproduct');
-	if (!empty($tcpdo)) {
-		$_REQUEST['product_id']=$tcpdo;
 	}
 }
 
