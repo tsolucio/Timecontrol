@@ -23,7 +23,7 @@ class convertTZListViewOnTimecontrol extends VTEventHandler {
 
 	public function handleFilter($handlerType, $parameter) {
 		global $adb;
-		if (getSalesEntityType($parameter[2])=='Timecontrol' && $handlerType=='corebos.filter.listview.render') {
+		if ($parameter[3]=='Timecontrol' && $handlerType=='corebos.filter.listview.render') {
 			// 0 -> Row
 			// 1 -> complete Data from Query
 			// 2 -> recordID
