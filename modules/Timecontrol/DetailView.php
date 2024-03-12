@@ -21,6 +21,9 @@ if ($focus->column_fields['date_end']=='') {
 	$year = $array_date[0];
 	$month = $array_date[1];
 	$day = $array_date[2];
+	if (empty($time)) {
+		$time = date('h:i:s');
+	}
 	$array_time = explode(':', $time);
 	$hour = $array_time[0];
 	$minute = $array_time[1];
