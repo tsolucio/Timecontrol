@@ -270,6 +270,9 @@ class Timecontrol extends CRMEntity {
 			$res = $adb->query($query);
 			$date = $adb->query_result($res, 0, 'date_start');
 			$time = $adb->query_result($res, 0, 'time_start');
+			if (empty($time)) {
+				$time = date('h:i:s');
+			}
 			list($year, $month, $day) = explode('-', $date);
 			list($hour, $minute, $seconds) = explode(':', $time);
 			$endtime = mktime($hour, $minute+$ttmin, $seconds, $month, $day, $year);
