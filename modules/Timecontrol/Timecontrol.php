@@ -210,7 +210,7 @@ class Timecontrol extends CRMEntity {
 		}
 		$this->updateTimesheetTotalTime();
 		$this->updateRelatedEntities($this->id);
-		if (!empty($this->column_fields['relatedto'])) {
+		if (!empty($this->column_fields['relatedto']) && isRecordExists($this->column_fields['relatedto'])) {
 			$relmod=getSalesEntityType($this->column_fields['relatedto']);
 			$seqfld=getModuleSequenceField($relmod);
 			$relm = CRMEntity::getInstance($relmod);
