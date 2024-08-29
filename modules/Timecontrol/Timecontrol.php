@@ -464,7 +464,7 @@ class Timecontrol extends CRMEntity {
 				'DETAILVIEWBASIC',
 				'Timecontrol',
 				'index.php?module=Timecontrol&action=EditView&createmode=link&return_id=$RECORD$&return_action=DetailView&return_module=$MODULE$&cbfromid=$RECORD$&relatedto=$RECORD$',
-				'modules/Timecontrol/images/stopwatch.gif'
+				'{"library":"utility", "icon":"clock"}'
 			);
 		}
 	}
