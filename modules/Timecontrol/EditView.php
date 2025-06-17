@@ -48,7 +48,7 @@ if (!empty($_REQUEST['calendarrecord'])) { // coming from Calendar
 	if (in_array('tcproduct', $cnusr)) {
 		$rshd=$adb->pquery('select tcproduct from vtiger_users where id=?', array($current_user->id));
 		if ($rshd && $adb->num_rows($rshd)>0) {
-			$tcpdo = $adb->query_result($rshd, 0, 'tcproduct');
+			$tcpdo = $rshd->fields['tcproduct'] ?? 0;
 			if (!empty($tcpdo)) {
 				$_REQUEST['product_id']=$tcpdo;
 			}
@@ -61,9 +61,9 @@ $relto = (!empty($_REQUEST['relatedto']) ? vtlib_purify($_REQUEST['relatedto']) 
 if (!empty($relto) && getSalesEntityType($relto)=='HelpDesk') { // coming from TT, pickup data
 	$rshd=$adb->pquery('select ticket_no,product_id from vtiger_troubletickets where ticketid=?', array($relto));
 	if (empty($_REQUEST['product_id'])) {
-		$_REQUEST['product_id']=$adb->query_result($rshd, 0, 'product_id');
+		$_REQUEST['product_id']=$rshd->fields['product_id'] ?? 0;
 	}
-	$_REQUEST['title']=$adb->query_result($rshd, 0, 'ticket_no');
+	$_REQUEST['title']=$rshd->fields['ticket_no'] ?? '';
 }
 
 require_once 'modules/Vtiger/EditView.php';

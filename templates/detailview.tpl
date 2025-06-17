@@ -22,8 +22,8 @@
 		</div>
 	</form>
 	<script type="text/javascript">
-      updateClock(true);
-      setInterval("updateClock()", 1000);
-    </script>
+		updateClock(true);
+		setInterval('updateClock()', 1000);
+	</script>
 	{/if}
 </div>

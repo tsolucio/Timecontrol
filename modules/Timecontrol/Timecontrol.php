@@ -203,7 +203,9 @@ class Timecontrol extends CRMEntity {
 		}
 	}
 
+	// phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
 	public function save_module($module) {
+	// phpcs:enable
 		global $adb;
 		if ($this->HasDirectImageField) {
 			$this->insertIntoAttachment($this->id, $module);
